@@ -9,7 +9,7 @@ export const curriculumWordLists = pgTable('curriculum_word_lists', {
   language: text('language').notNull(),
   scriptType: text('script_type').notNull().default('latin'), // latin | cjk | rtl | hangul
   name: text('name').notNull(),
-  words: jsonb('words').notNull().$type<string[]>(),
+  words: jsonb('words').notNull().$type<Array<{ word: string; pos?: string; phonetic?: string }>>(),
   matchMode: text('match_mode').notNull().default('word'), // character | word | syllable | pinyin
   version: integer('version').notNull().default(1),
   isSharedClassList: boolean('is_shared_class_list').notNull().default(false),

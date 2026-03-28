@@ -10,13 +10,22 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@tiny-story-world/audio": "*",
     "@tiny-story-world/db": "*",
+    "@tiny-story-world/i18n": "*",
+    "@tiny-story-world/sentence-engine": "*",
+    "@tiny-story-world/types": "*",
+    "@tiny-story-world/ui": "*",
     "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.2",
     "next": "^15",
     "next-auth": "^5.0.0-beta.30",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
