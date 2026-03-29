@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { Fragment, useCallback, useState, useEffect } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -311,15 +311,14 @@ function GameScreen() {
         >
           <SortableContext items={tileIds} strategy={horizontalListSortingStrategy}>
             {sentenceTray.map((tile, i) => (
-              <>
+              <Fragment key={tile.instanceId}>
                 {insertPreviewIndex === i && (
                   <div
-                    key="insert-gap"
                     className="w-14 h-12 md:w-16 md:h-14 rounded-xl border-2 border-dashed border-purple-400 bg-purple-100/50 flex-shrink-0 transition-all duration-200"
                   />
                 )}
-                <SortableTrayTile key={tile.instanceId} tile={tile} index={i} />
-              </>
+                <SortableTrayTile tile={tile} index={i} />
+              </Fragment>
             ))}
             {insertPreviewIndex !== null && insertPreviewIndex >= sentenceTray.length && (
               <div
