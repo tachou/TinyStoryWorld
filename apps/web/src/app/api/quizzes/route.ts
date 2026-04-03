@@ -21,10 +21,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { bookId } = await req.json();
+  const { bookId, curriculumWords } = await req.json();
   if (!bookId) {
     return NextResponse.json({ error: 'bookId is required' }, { status: 400 });
   }
+  const vocabWords: string[] | undefined = Array.isArray(curriculumWords) && curriculumWords.length > 0
+    ? curriculumWords
+    : undefined;
 
   const db = getDb();
 
@@ -56,6 +59,14 @@ export async function POST(req: NextRequest) {
       const Anthropic = (await import('@anthropic-ai/sdk')).default;
       const client = new Anthropic({ apiKey });
 
+      let vocabInstructions = '';
+      if (vocabWords) {
+        vocabInstructions = `\n\nCURRICULUM VOCABULARY:
+The student is learning these words: ${vocabWords.join(', ')}
+- When these words appear in the text, create questions that test understanding of those specific words
+- At least 1-2 questions should focus on curriculum vocabulary words found in the text`;
+      }
+
       const message = await client.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
@@ -66,7 +77,7 @@ Rules:
 - Include a mix of question types: 2 literal (facts from text), 2 inferential (understanding meaning), 1 applied (connecting to real life)
 - Use language appropriate for the book's reading level
 - Questions should be in the same language as the book text
-- Return ONLY valid JSON, no markdown fences`,
+- Return ONLY valid JSON, no markdown fences${vocabInstructions}`,
         messages: [
           {
             role: 'user',

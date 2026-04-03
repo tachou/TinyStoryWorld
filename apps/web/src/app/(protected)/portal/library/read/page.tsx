@@ -5,11 +5,13 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { BookReader } from '@/features/reader/components/BookReader';
 import { VocabularyCards } from '@/features/reader/components/VocabularyCards';
 import { QuizModal } from '@/features/quiz/components/QuizModal';
+import { useLanguageStore } from '@/stores/languageStore';
 
 function ReadPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const bookId = searchParams.get('bookId');
+  const activeWords = useLanguageStore((s) => s.activeWords);
   const [book, setBook] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +99,10 @@ function ReadPageContent() {
       const res = await fetch('/api/quizzes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookId }),
+        body: JSON.stringify({
+          bookId,
+          curriculumWords: activeWords.length > 0 ? activeWords.map(w => w.word) : undefined,
+        }),
       });
       if (res.ok) {
         const data = await res.json();

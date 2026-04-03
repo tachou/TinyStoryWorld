@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDb, curriculumWordLists, studentProfiles, classes } from '@tiny-story-world/db';
 import { eq, and, or, inArray } from 'drizzle-orm';
+import { autoTagWords } from '@/lib/posLookup';
 
 /**
  * GET /api/word-lists — List word lists for the current user
@@ -75,6 +76,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'name, language, and words are required' }, { status: 400 });
   }
 
+  // Auto-detect POS for words missing a pos field
+  const taggedWords = autoTagWords(words, language);
+
   const db = getDb();
   const [list] = await db
     .insert(curriculumWordLists)
@@ -83,7 +87,7 @@ export async function POST(req: NextRequest) {
       ownerType: role === 'parent' ? 'parent' : 'teacher',
       name,
       language,
-      words,
+      words: taggedWords,
       scriptType: scriptType || (language === 'zh-Hans' ? 'cjk' : 'latin'),
     })
     .returning();

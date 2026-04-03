@@ -174,12 +174,15 @@ New component shown after a story is generated, showing matched/unmatched curric
 - [x] Updated AI Stories to default reading stage from profile
 - [x] Updated AI Stories to auto-populate wordlist from global store
 
+### Completed (cont.)
+- [x] Update Battle Stories API to accept curriculum words in prompt
+- [x] Add VocabularySpotlight to Battle Stories detail page
+- [x] Add VocabularySpotlight to AI Stories detail page
+- [x] Update Book Library to auto-use global wordlist for coverage scoring
+- [x] Update Quizzes to focus on curriculum words (server + client wired)
+- [x] Add CurriculumBadge to each module header
+- [x] Teacher dashboard: student curriculum assignment view (in Classes page)
+- [x] POS auto-detection for CSV uploads without POS column (`posLookup.ts`)
+
 ### Remaining
-- [ ] Update Battle Stories API to accept curriculum words in prompt
-- [ ] Add VocabularySpotlight to Battle Stories detail page
-- [ ] Add VocabularySpotlight to AI Stories detail page
-- [ ] Update Book Library to auto-use global wordlist for coverage scoring
-- [ ] Update Quizzes to focus on curriculum words
-- [ ] Add CurriculumBadge to each module header
-- [ ] Teacher dashboard: student curriculum assignment view
 - [ ] Testing all module integrations end-to-end

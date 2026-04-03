@@ -23,6 +23,21 @@ interface StudentData {
   totalStars: number;
 }
 
+interface WordListOption {
+  id: string;
+  name: string;
+  language: string;
+  words: { word: string }[];
+}
+
+interface CurriculumConfig {
+  id: string;
+  studentId: string;
+  language: string;
+  wordlistIds: string[];
+  filterEnabled: boolean;
+}
+
 const STAGE_LABELS: Record<string, string> = {
   emergent: 'Emergent',
   beginner: 'Beginner',
@@ -57,6 +72,12 @@ export default function ClassesPage() {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
 
+  // Curriculum assignment state
+  const [wordLists, setWordLists] = useState<WordListOption[]>([]);
+  const [curriculumConfigs, setCurriculumConfigs] = useState<Record<string, CurriculumConfig[]>>({});
+  const [curriculumLang, setCurriculumLang] = useState('en');
+  const [savingCurriculum, setSavingCurriculum] = useState<string | null>(null);
+
   const fetchClasses = useCallback(async () => {
     try {
       const res = await fetch('/api/classes');
@@ -68,21 +89,67 @@ export default function ClassesPage() {
     }
   }, []);
 
+  const fetchStudentCurriculum = useCallback(async (studentUserId: string) => {
+    try {
+      const res = await fetch(`/api/students/${studentUserId}/curriculum`);
+      if (res.ok) {
+        const configs: CurriculumConfig[] = await res.json();
+        setCurriculumConfigs((prev) => ({ ...prev, [studentUserId]: configs }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch curriculum for student:', err);
+    }
+  }, []);
+
   const fetchClassDetails = useCallback(async (classId: string) => {
     try {
       const res = await fetch(`/api/classes/${classId}`);
       if (res.ok) {
         const data = await res.json();
         setSelectedClass(data);
+        // Fetch curriculum configs for each student
+        if (data.students) {
+          for (const student of data.students) {
+            fetchStudentCurriculum(student.userId);
+          }
+        }
       }
     } catch (err) {
       console.error('Failed to fetch class details:', err);
     }
+  }, [fetchStudentCurriculum]);
+
+  const fetchWordLists = useCallback(async () => {
+    try {
+      const res = await fetch('/api/word-lists');
+      if (res.ok) setWordLists(await res.json());
+    } catch (err) {
+      console.error('Failed to fetch word lists:', err);
+    }
   }, []);
+
+  const handleAssignCurriculum = async (studentUserId: string, wordlistId: string | null, language: string) => {
+    setSavingCurriculum(studentUserId);
+    try {
+      const res = await fetch(`/api/students/${studentUserId}/curriculum`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wordlistId, language }),
+      });
+      if (res.ok) {
+        await fetchStudentCurriculum(studentUserId);
+      }
+    } catch (err) {
+      console.error('Failed to assign curriculum:', err);
+    } finally {
+      setSavingCurriculum(null);
+    }
+  };
 
   useEffect(() => {
     fetchClasses();
-  }, [fetchClasses]);
+    fetchWordLists();
+  }, [fetchClasses, fetchWordLists]);
 
   const handleCreateClass = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -353,20 +420,40 @@ export default function ClassesPage() {
 
               {/* Student Table */}
               {selectedClass.students && selectedClass.students.length > 0 ? (
-                <div className="overflow-x-auto">
+                <div>
+                  {/* Curriculum language filter */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <label className="text-xs font-medium text-gray-500">Curriculum language:</label>
+                    <select
+                      value={curriculumLang}
+                      onChange={(e) => setCurriculumLang(e.target.value)}
+                      className="text-xs border border-gray-300 rounded-lg px-2 py-1"
+                    >
+                      <option value="en">English</option>
+                      <option value="fr">French</option>
+                      <option value="zh-Hans">Chinese</option>
+                    </select>
+                  </div>
+                  <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-200">
                         <th className="text-left py-2 px-3 font-medium text-gray-500">Student</th>
                         <th className="text-left py-2 px-3 font-medium text-gray-500">Stage</th>
-                        <th className="text-left py-2 px-3 font-medium text-gray-500">Level</th>
+                        <th className="text-left py-2 px-3 font-medium text-gray-500">Curriculum</th>
                         <th className="text-left py-2 px-3 font-medium text-gray-500">Books Read</th>
                         <th className="text-left py-2 px-3 font-medium text-gray-500">Stars</th>
                         <th className="text-right py-2 px-3 font-medium text-gray-500">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedClass.students.map((student) => (
+                      {selectedClass.students.map((student) => {
+                        const configs = curriculumConfigs[student.userId] || [];
+                        const langConfig = configs.find((c) => c.language === curriculumLang);
+                        const assignedWordlistId = langConfig?.wordlistIds?.[0] || '';
+                        const filteredWordLists = wordLists.filter((wl) => wl.language === curriculumLang);
+
+                        return (
                         <tr key={student.profileId} className="border-b border-gray-100 hover:bg-gray-50">
                           <td className="py-3 px-3">
                             <p className="font-medium text-gray-900">{student.displayName}</p>
@@ -377,7 +464,31 @@ export default function ClassesPage() {
                               {STAGE_LABELS[student.readingStage] || student.readingStage}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-gray-600">{student.currentLevel}</td>
+                          <td className="py-3 px-3">
+                            <select
+                              value={assignedWordlistId}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                handleAssignCurriculum(
+                                  student.userId,
+                                  val || null,
+                                  curriculumLang
+                                );
+                              }}
+                              disabled={savingCurriculum === student.userId}
+                              className="text-xs border border-gray-300 rounded-lg px-2 py-1.5 w-full max-w-[180px] disabled:opacity-50"
+                            >
+                              <option value="">Default pool</option>
+                              {filteredWordLists.map((wl) => (
+                                <option key={wl.id} value={wl.id}>
+                                  {wl.name} ({wl.words.length})
+                                </option>
+                              ))}
+                            </select>
+                            {savingCurriculum === student.userId && (
+                              <span className="ml-1 text-[10px] text-indigo-500">Saving...</span>
+                            )}
+                          </td>
                           <td className="py-3 px-3 text-gray-600">{student.totalBooksRead}</td>
                           <td className="py-3 px-3 text-gray-600">{student.totalStars}</td>
                           <td className="py-3 px-3 text-right">
@@ -389,9 +500,11 @@ export default function ClassesPage() {
                             </button>
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-400">
