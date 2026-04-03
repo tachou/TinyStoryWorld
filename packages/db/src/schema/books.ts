@@ -26,6 +26,13 @@ export const books = pgTable('books', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+/** Per-word timing for audio sync */
+export interface WordAlignment {
+  word: string;
+  start: number; // seconds from page audio start
+  end: number;
+}
+
 export const bookPages = pgTable('book_pages', {
   id: uuid('id').defaultRandom().primaryKey(),
   bookId: uuid('book_id').notNull().references(() => books.id),
@@ -33,7 +40,10 @@ export const bookPages = pgTable('book_pages', {
   textContent: text('text_content').notNull(),
   illustrationUrl: text('illustration_url'),
   vocabWords: jsonb('vocab_words').$type<string[]>(),
-  audioSegment: jsonb('audio_segment'), // { start, end } timestamps
+  /** Per-word timing alignment for karaoke highlighting */
+  wordAlignments: jsonb('word_alignments').$type<WordAlignment[]>(),
+  /** Page-level audio segment within book audio file */
+  audioSegment: jsonb('audio_segment').$type<{ start: number; end: number }>(),
 });
 
 export const bookCurriculumScores = pgTable('book_curriculum_scores', {

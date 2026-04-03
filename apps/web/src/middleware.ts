@@ -9,7 +9,9 @@ export default auth((req) => {
   // Public routes
   const publicRoutes = ['/', '/login', '/register'];
   const isPublicRoute =
-    publicRoutes.includes(pathname) || pathname.startsWith('/api/auth');
+    publicRoutes.includes(pathname) ||
+    pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api/seed');
 
   if (isPublicRoute) return NextResponse.next();
 

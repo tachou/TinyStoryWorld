@@ -23,39 +23,7 @@ import { PosLegend } from '@tiny-story-world/ui';
 import { t } from '@tiny-story-world/i18n';
 import { speakSentence, speakWord, stopSpeech, preloadVoices } from '@tiny-story-world/audio';
 import { useGameStore } from '../store/gameStore';
-
-// ─── Language Selection Screen ──────────────────────────────────────────
-
-function LanguageSelection() {
-  const setLanguage = useGameStore((s) => s.setLanguage);
-  const uiLanguage = useGameStore((s) => s.uiLanguage);
-  const locale = t(uiLanguage);
-
-  const languages: { lang: Language; flag: string; label: string }[] = [
-    { lang: 'en', flag: '\u{1F1EC}\u{1F1E7}', label: 'English' },
-    { lang: 'fr', flag: '\u{1F1EB}\u{1F1F7}', label: 'Fran\u00e7ais' },
-    { lang: 'zh-Hans', flag: '\u{1F1E8}\u{1F1F3}', label: '\u4e2d\u6587' },
-  ];
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
-      <h1 className="text-4xl font-bold text-purple-700">{locale.appTitle}</h1>
-      <p className="text-lg text-gray-600">{locale.selectLanguage}</p>
-      <div className="flex gap-4">
-        {languages.map(({ lang, flag, label }) => (
-          <button
-            key={lang}
-            onClick={() => setLanguage(lang)}
-            className="flex flex-col items-center gap-2 px-8 py-6 rounded-2xl border-2 border-gray-200 bg-white shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-          >
-            <span className="text-5xl">{flag}</span>
-            <span className="text-lg font-semibold text-gray-700">{label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
+import { useLanguageStore } from '@/stores/languageStore';
 
 // ─── Draggable Tile (word pool) ─────────────────────────────────────────
 
@@ -282,12 +250,7 @@ function GameScreen() {
       <div className="flex flex-col gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <button
-            onClick={goHome}
-            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            {'\u2190'} {locale.home}
-          </button>
+          <h2 className="text-lg font-bold text-purple-700">{locale.appTitle}</h2>
           <PosLegend
             title={locale.legend}
             labels={{
@@ -408,7 +371,16 @@ function GameScreen() {
 // ─── Main Export ────────────────────────────────────────────────────────
 
 export function SillySentencesGame() {
-  const language = useGameStore((s) => s.language);
+  const gameLanguage = useGameStore((s) => s.language);
+  const globalLanguage = useLanguageStore((s) => s.language);
+  const setLanguage = useGameStore((s) => s.setLanguage);
 
-  return language ? <GameScreen /> : <LanguageSelection />;
+  // Sync global language → game store: initialize on mount and when global language changes
+  useEffect(() => {
+    if (!gameLanguage || gameLanguage !== globalLanguage) {
+      setLanguage(globalLanguage);
+    }
+  }, [globalLanguage, gameLanguage, setLanguage]);
+
+  return gameLanguage ? <GameScreen /> : null;
 }

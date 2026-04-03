@@ -87,6 +87,78 @@ export function selectRoundWords(
   return selectFromPool(all, count, usageCounts, anchors);
 }
 
+export function selectRoundWordsWithCurriculum(
+  lang: Language,
+  count: number = 20,
+  usageCounts: Record<string, number> = {},
+  curriculumEntries: WordEntry[]
+): WordEntry[] {
+  const all = getWordList(lang);
+  const anchorWords = ANCHOR_WORDS[lang] || [];
+  const anchors = resolveAnchors(all, anchorWords);
+  const anchorIds = new Set(anchors.map((w) => w.id));
+
+  const selected: WordEntry[] = [...anchors];
+  const remainingCount = count - anchors.length;
+
+  // Separate curriculum entries by POS
+  const currByPos = {
+    noun: curriculumEntries.filter((w) => w.pos === 'noun'),
+    verb: curriculumEntries.filter((w) => w.pos === 'verb'),
+    adjective: curriculumEntries.filter((w) => w.pos === 'adjective'),
+    adverb: curriculumEntries.filter((w) => w.pos === 'adverb'),
+    phrase: curriculumEntries.filter((w) => w.pos === 'phrase' || w.pos === 'particle'),
+    conjunction: curriculumEntries.filter((w) => w.pos === 'conjunction'),
+  };
+
+  // Pool words excluding anchors
+  const pool = all.filter((w) => !anchorIds.has(w.id));
+  const poolByPos = {
+    noun: pool.filter((w) => w.pos === 'noun'),
+    verb: pool.filter((w) => w.pos === 'verb'),
+    adjective: pool.filter((w) => w.pos === 'adjective'),
+    adverb: pool.filter((w) => w.pos === 'adverb'),
+    phrase: pool.filter((w) => w.pos === 'phrase' || w.pos === 'particle'),
+    conjunction: pool.filter((w) => w.pos === 'conjunction'),
+  };
+
+  const targets: [keyof typeof currByPos, number][] = [
+    ['noun', 4], ['verb', 3], ['adjective', 2],
+    ['adverb', 1], ['phrase', 1], ['conjunction', 0],
+  ];
+
+  const randomSelected: WordEntry[] = [];
+  const usedIds = new Set<string>(anchorIds);
+
+  for (const [pos, desired] of targets) {
+    // Pick from curriculum first (prioritized via weighted pick)
+    const currAvailable = currByPos[pos].filter((w) => !usedIds.has(w.id));
+    const fromCurr = weightedPick(currAvailable, desired, usageCounts);
+    for (const w of fromCurr) usedIds.add(w.id);
+
+    // Pad remaining slots from pool
+    const needed = desired - fromCurr.length;
+    if (needed > 0) {
+      const poolAvailable = poolByPos[pos].filter((w) => !usedIds.has(w.id));
+      const fromPool = weightedPick(poolAvailable, needed, usageCounts);
+      for (const w of fromPool) usedIds.add(w.id);
+      randomSelected.push(...fromCurr, ...fromPool);
+    } else {
+      randomSelected.push(...fromCurr);
+    }
+  }
+
+  // Fill any remaining count from pool words not already selected
+  const totalNeeded = remainingCount - randomSelected.length;
+  if (totalNeeded > 0) {
+    const remaining = pool.filter((w) => !usedIds.has(w.id));
+    randomSelected.push(...weightedPick(remaining, totalNeeded, usageCounts));
+  }
+
+  selected.push(...randomSelected);
+  return shuffle(selected);
+}
+
 function selectFromPool(
   all: WordEntry[],
   count: number,

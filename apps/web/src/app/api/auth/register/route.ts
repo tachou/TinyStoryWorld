@@ -35,8 +35,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newUser, { status: 201 });
   } catch (error: any) {
+    const cause = error?.cause;
     if (
       error?.code === '23505' ||
+      cause?.code === '23505' ||
       error?.message?.includes('unique') ||
       error?.message?.includes('duplicate')
     ) {

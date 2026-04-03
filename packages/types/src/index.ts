@@ -2,7 +2,7 @@ export type UserRole = 'student' | 'teacher' | 'parent' | 'admin' | 'editor';
 
 export type Language = 'en' | 'fr' | 'zh-Hans';
 
-export type ReadingStage = 'emergent' | 'beginner' | 'in-transition' | 'competent' | 'experienced';
+export type ReadingStage = 'emergent' | 'beginner' | 'in_transition' | 'competent' | 'experienced';
 
 export type PartOfSpeech =
   | 'noun' | 'verb' | 'adjective' | 'adverb'

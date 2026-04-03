@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { getDb, curriculumWordLists } from '@tiny-story-world/db';
-import { eq, and } from 'drizzle-orm';
+import { getDb, curriculumWordLists, studentProfiles, classes } from '@tiny-story-world/db';
+import { eq, and, or, inArray } from 'drizzle-orm';
 
 /**
  * GET /api/word-lists — List word lists for the current user
+ * Teachers see their own lists.
+ * Students see their own lists + lists owned by their class teachers.
  */
 export async function GET() {
   const session = await auth();
@@ -13,6 +15,36 @@ export async function GET() {
   }
 
   const db = getDb();
+  const role = (session.user as any).role;
+
+  if (role === 'student') {
+    // Find teacher IDs from the student's classes
+    const myProfiles = await db
+      .select({ classId: studentProfiles.classId })
+      .from(studentProfiles)
+      .where(eq(studentProfiles.userId, session.user.id));
+
+    const teacherIds: string[] = [];
+    if (myProfiles.length > 0) {
+      const classIds = myProfiles.map((p) => p.classId);
+      const teacherClasses = await db
+        .select({ teacherId: classes.teacherId })
+        .from(classes)
+        .where(inArray(classes.id, classIds));
+      teacherIds.push(...teacherClasses.map((c) => c.teacherId));
+    }
+
+    // Get own lists + teacher lists
+    const ownerIds = [...new Set([session.user.id, ...teacherIds])];
+    const lists = await db
+      .select()
+      .from(curriculumWordLists)
+      .where(inArray(curriculumWordLists.ownerId, ownerIds));
+
+    return NextResponse.json(lists);
+  }
+
+  // Teachers/parents/admins see their own lists
   const lists = await db
     .select()
     .from(curriculumWordLists)

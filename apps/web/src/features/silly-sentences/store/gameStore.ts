@@ -3,7 +3,9 @@
 import { create } from 'zustand';
 import type { Language, WordTile, WordEntry, GrammarFeedback } from '@tiny-story-world/types';
 import { generateSentences } from '@tiny-story-world/sentence-engine';
-import { selectRoundWords } from '../data';
+import { selectRoundWords, selectRoundWordsWithCurriculum } from '../data';
+import { useLanguageStore } from '@/stores/languageStore';
+import { resolvePos, getResolvedWordsWithPos } from '@/lib/posTagging';
 
 const MAX_TRAY_SIZE = 12;
 
@@ -71,7 +73,15 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setLanguage: (lang) => {
     const state = get();
-    const words = selectRoundWords(lang, 20, state.wordUsageCount);
+    const { activeWords } = useLanguageStore.getState();
+    let words: WordEntry[];
+    if (activeWords.length > 0) {
+      const resolved = resolvePos(activeWords, lang);
+      const currEntries = getResolvedWordsWithPos(resolved);
+      words = selectRoundWordsWithCurriculum(lang, 20, state.wordUsageCount, currEntries);
+    } else {
+      words = selectRoundWords(lang, 20, state.wordUsageCount);
+    }
     const newUsage = incrementUsage(state.wordUsageCount, words);
     set({
       language: lang,
@@ -87,7 +97,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   startNewRound: () => {
     const state = get();
     if (!state.language) return;
-    const words = selectRoundWords(state.language, 20, state.wordUsageCount);
+    const { activeWords } = useLanguageStore.getState();
+    let words: WordEntry[];
+    if (activeWords.length > 0) {
+      const resolved = resolvePos(activeWords, state.language);
+      const currEntries = getResolvedWordsWithPos(resolved);
+      words = selectRoundWordsWithCurriculum(state.language, 20, state.wordUsageCount, currEntries);
+    } else {
+      words = selectRoundWords(state.language, 20, state.wordUsageCount);
+    }
     const newUsage = incrementUsage(state.wordUsageCount, words);
     set({
       wordPool: createTileInstances(words),
