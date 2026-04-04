@@ -20,6 +20,7 @@ const teacherNav: NavItem[] = [
   { label: 'My Classes', href: '/dashboard/classes', icon: '\u{1F469}\u200D\u{1F3EB}' },
   { label: 'Assignments', href: '/dashboard/assignments', icon: '\u{1F4DD}' },
   { label: 'Word Lists', href: '/dashboard/word-lists', icon: '\u{1F4CB}' },
+  { label: 'Books', href: '/dashboard/books', icon: '\u{1F4DA}' },
   { label: 'Progress Reports', href: '/dashboard/reports', icon: '\u{1F4C8}' },
   { label: 'Moderation', href: '/dashboard/moderation', icon: '\u{1F6E1}\uFE0F' },
 ];

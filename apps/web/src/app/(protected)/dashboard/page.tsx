@@ -28,6 +28,12 @@ export default async function DashboardPage() {
       description: 'Upload curriculum word lists to filter books and activities.',
     },
     {
+      href: '/dashboard/books',
+      icon: '\u{1F4DA}',
+      title: 'Book Library',
+      description: 'Import, browse, and manage books for your students.',
+    },
+    {
       href: '/dashboard/reports',
       icon: '\u{1F4C8}',
       title: 'Progress Reports',
