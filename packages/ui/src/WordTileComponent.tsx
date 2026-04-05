@@ -18,6 +18,8 @@ export interface WordTileProps {
   showPos?: boolean;
   /** Whether the current language is Chinese (affects font size) */
   isChinese?: boolean;
+  /** Whether a curriculum is active (to show bonus word indicators) */
+  hasCurriculum?: boolean;
   style?: CSSProperties;
   className?: string;
   'aria-description'?: string;
@@ -35,6 +37,7 @@ export const WordTileComponent = forwardRef<HTMLDivElement, WordTileProps>(
       showPinyin = false,
       showPos = false,
       isChinese = false,
+      hasCurriculum = false,
       style,
       className = '',
       'aria-description': ariaDescription,
@@ -48,11 +51,16 @@ export const WordTileComponent = forwardRef<HTMLDivElement, WordTileProps>(
       ? tile.word.charAt(0).toUpperCase() + tile.word.slice(1)
       : tile.word;
 
+    // A "bonus word" is one not from the curriculum (only relevant when a curriculum is active)
+    const isBonusWord = hasCurriculum && tile.fromCurriculum === false;
+
     const bgColorClass = isError
       ? 'bg-orange-200 border-orange-400'
       : isHighlighted
         ? 'bg-yellow-300 border-yellow-500 ring-2 ring-yellow-400'
-        : `${colors.bg} ${colors.border}`;
+        : isBonusWord
+          ? `${colors.bg} border-dashed border-gray-400 opacity-75`
+          : `${colors.bg} ${colors.border}`;
 
     const handleKeyDown = useCallback(
       (e: KeyboardEvent<HTMLDivElement>) => {
@@ -91,7 +99,16 @@ export const WordTileComponent = forwardRef<HTMLDivElement, WordTileProps>(
         tabIndex={0}
         {...props}
       >
-        {showPos && (
+        {isBonusWord && (
+          <span
+            className="text-[10px] font-medium text-gray-500 bg-white/70 rounded px-1"
+            aria-hidden="true"
+            title="Bonus word (not in your word list)"
+          >
+            +
+          </span>
+        )}
+        {showPos && !isBonusWord && (
           <span
             className="text-[10px] uppercase font-medium text-gray-500 bg-white/50 rounded px-1"
             aria-hidden="true"

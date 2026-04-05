@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { getDb, studentCurriculumConfigs, curriculumWordLists } from '@tiny-story-world/db';
-import { eq, and } from 'drizzle-orm';
+import { getDb, studentCurriculumConfigs, curriculumWordLists, classCurriculumConfigs, studentProfiles } from '@tiny-story-world/db';
+import { eq, and, inArray } from 'drizzle-orm';
 
 /**
  * GET /api/curriculum/active?language=fr
@@ -35,37 +35,96 @@ export async function GET(req: NextRequest) {
     )
     .limit(1);
 
-  if (!config || config.wordlistIds.length === 0) {
-    return NextResponse.json({
-      wordlist: null,
-      source: 'default',
-      isLocked: false,
-    });
+  if (config && config.wordlistIds.length > 0) {
+    // Student-level assignment takes priority
+    const [wordlist] = await db
+      .select({
+        id: curriculumWordLists.id,
+        name: curriculumWordLists.name,
+        language: curriculumWordLists.language,
+        words: curriculumWordLists.words,
+      })
+      .from(curriculumWordLists)
+      .where(eq(curriculumWordLists.id, config.wordlistIds[0]))
+      .limit(1);
+
+    if (wordlist) {
+      return NextResponse.json({
+        wordlist,
+        source: 'teacher',
+        isLocked: true,
+      });
+    }
   }
 
-  // Fetch the first wordlist from the assigned config
-  const [wordlist] = await db
-    .select({
-      id: curriculumWordLists.id,
-      name: curriculumWordLists.name,
-      language: curriculumWordLists.language,
-      words: curriculumWordLists.words,
-    })
-    .from(curriculumWordLists)
-    .where(eq(curriculumWordLists.id, config.wordlistIds[0]))
-    .limit(1);
+  // Fallback: check class-level word lists
+  // Find the student's class(es)
+  const profiles = await db
+    .select({ classId: studentProfiles.classId })
+    .from(studentProfiles)
+    .where(eq(studentProfiles.userId, session.user.id));
 
-  if (!wordlist) {
-    return NextResponse.json({
-      wordlist: null,
-      source: 'default',
-      isLocked: false,
-    });
+  if (profiles.length > 0) {
+    const classIds = profiles.map((p) => p.classId);
+
+    // Get all class curriculum configs for the student's classes
+    const classConfigs = await db
+      .select({ wordlistId: classCurriculumConfigs.wordlistId })
+      .from(classCurriculumConfigs)
+      .where(inArray(classCurriculumConfigs.classId, classIds));
+
+    if (classConfigs.length > 0) {
+      const wordlistIds = classConfigs.map((c) => c.wordlistId);
+
+      // Fetch all word lists and filter by language
+      const wordlists = await db
+        .select({
+          id: curriculumWordLists.id,
+          name: curriculumWordLists.name,
+          language: curriculumWordLists.language,
+          words: curriculumWordLists.words,
+        })
+        .from(curriculumWordLists)
+        .where(
+          and(
+            inArray(curriculumWordLists.id, wordlistIds),
+            eq(curriculumWordLists.language, language)
+          )
+        );
+
+      if (wordlists.length > 0) {
+        // Merge all word lists into a combined set
+        const allWords: Array<{ word: string; pos?: string; phonetic?: string }> = [];
+        const seen = new Set<string>();
+
+        for (const wl of wordlists) {
+          for (const w of wl.words) {
+            const key = w.word.toLowerCase();
+            if (!seen.has(key)) {
+              seen.add(key);
+              allWords.push(w);
+            }
+          }
+        }
+
+        const listNames = wordlists.map((wl) => wl.name).join(' + ');
+        return NextResponse.json({
+          wordlist: {
+            id: wordlists[0].id, // Use first list ID as reference
+            name: `${listNames} (${allWords.length} words)`,
+            language,
+            words: allWords,
+          },
+          source: 'class',
+          isLocked: true,
+        });
+      }
+    }
   }
 
   return NextResponse.json({
-    wordlist,
-    source: 'teacher',
-    isLocked: true,
+    wordlist: null,
+    source: 'default',
+    isLocked: false,
   });
 }

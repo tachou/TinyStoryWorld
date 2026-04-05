@@ -78,6 +78,19 @@ export default function ClassesPage() {
   const [curriculumLang, setCurriculumLang] = useState('en');
   const [savingCurriculum, setSavingCurriculum] = useState<string | null>(null);
 
+  // Class-level curriculum state
+  interface ClassWordList {
+    configId: string;
+    wordlistId: string;
+    name: string;
+    language: string;
+    words: { word: string }[];
+    addedAt: string;
+  }
+  const [classWordLists, setClassWordLists] = useState<ClassWordList[]>([]);
+  const [addingClassWl, setAddingClassWl] = useState(false);
+  const [classWlSelect, setClassWlSelect] = useState('');
+
   const fetchClasses = useCallback(async () => {
     try {
       const res = await fetch('/api/classes');
@@ -101,12 +114,25 @@ export default function ClassesPage() {
     }
   }, []);
 
+  const fetchClassCurriculum = useCallback(async (classId: string) => {
+    try {
+      const res = await fetch(`/api/classes/${classId}/curriculum`);
+      if (res.ok) {
+        setClassWordLists(await res.json());
+      }
+    } catch (err) {
+      console.error('Failed to fetch class curriculum:', err);
+    }
+  }, []);
+
   const fetchClassDetails = useCallback(async (classId: string) => {
     try {
       const res = await fetch(`/api/classes/${classId}`);
       if (res.ok) {
         const data = await res.json();
         setSelectedClass(data);
+        // Fetch class-level curriculum
+        fetchClassCurriculum(classId);
         // Fetch curriculum configs for each student
         if (data.students) {
           for (const student of data.students) {
@@ -117,7 +143,7 @@ export default function ClassesPage() {
     } catch (err) {
       console.error('Failed to fetch class details:', err);
     }
-  }, [fetchStudentCurriculum]);
+  }, [fetchStudentCurriculum, fetchClassCurriculum]);
 
   const fetchWordLists = useCallback(async () => {
     try {
@@ -127,6 +153,40 @@ export default function ClassesPage() {
       console.error('Failed to fetch word lists:', err);
     }
   }, []);
+
+  const handleAddClassWordList = async (classId: string, wordlistId: string) => {
+    setAddingClassWl(true);
+    try {
+      const res = await fetch(`/api/classes/${classId}/curriculum`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wordlistId }),
+      });
+      if (res.ok) {
+        setClassWlSelect('');
+        await fetchClassCurriculum(classId);
+      }
+    } catch (err) {
+      console.error('Failed to add class word list:', err);
+    } finally {
+      setAddingClassWl(false);
+    }
+  };
+
+  const handleRemoveClassWordList = async (classId: string, wordlistId: string) => {
+    try {
+      const res = await fetch(`/api/classes/${classId}/curriculum`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wordlistId }),
+      });
+      if (res.ok) {
+        await fetchClassCurriculum(classId);
+      }
+    } catch (err) {
+      console.error('Failed to remove class word list:', err);
+    }
+  };
 
   const handleAssignCurriculum = async (studentUserId: string, wordlistId: string | null, language: string) => {
     setSavingCurriculum(studentUserId);
@@ -417,6 +477,81 @@ export default function ClassesPage() {
                   {formSuccess && <p className="text-sm text-green-600 mt-2">{formSuccess}</p>}
                 </form>
               )}
+
+              {/* Class Word Lists */}
+              <div className="mb-6 p-4 bg-amber-50/50 rounded-lg border border-amber-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-700">Class Word Lists</h3>
+                  <span className="text-[10px] text-gray-400">Applied to all students</span>
+                </div>
+
+                {/* Assigned word list chips */}
+                {classWordLists.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {classWordLists.map((cwl) => (
+                      <span
+                        key={cwl.configId}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-amber-300 rounded-full text-sm shadow-sm"
+                      >
+                        <span className="font-medium text-gray-800">{cwl.name}</span>
+                        <span className="text-[10px] text-gray-400">
+                          ({cwl.words.length} words)
+                        </span>
+                        <button
+                          onClick={() => handleRemoveClassWordList(selectedClass.id, cwl.wordlistId)}
+                          className="ml-1 text-gray-400 hover:text-red-500 transition-colors"
+                          title="Remove from class"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 mb-3">No word lists assigned to this class yet.</p>
+                )}
+
+                {/* Combined word count */}
+                {classWordLists.length > 0 && (
+                  <p className="text-xs text-amber-700 mb-3">
+                    Combined: {(() => {
+                      const seen = new Set<string>();
+                      classWordLists.forEach((cwl) => cwl.words.forEach((w) => seen.add(w.word.toLowerCase())));
+                      return seen.size;
+                    })()} unique words across {classWordLists.length} list{classWordLists.length !== 1 ? 's' : ''}
+                  </p>
+                )}
+
+                {/* Add word list dropdown */}
+                <div className="flex gap-2 items-center">
+                  <select
+                    value={classWlSelect}
+                    onChange={(e) => setClassWlSelect(e.target.value)}
+                    className="text-xs border border-gray-300 rounded-lg px-2 py-1.5 flex-1"
+                    disabled={addingClassWl}
+                  >
+                    <option value="">Select a word list to add...</option>
+                    {wordLists
+                      .filter((wl) => !classWordLists.some((cwl) => cwl.wordlistId === wl.id))
+                      .map((wl) => (
+                        <option key={wl.id} value={wl.id}>
+                          {wl.name} ({wl.language === 'en' ? 'EN' : wl.language === 'fr' ? 'FR' : 'ZH'}, {wl.words.length} words)
+                        </option>
+                      ))}
+                  </select>
+                  <button
+                    onClick={() => {
+                      if (classWlSelect) handleAddClassWordList(selectedClass.id, classWlSelect);
+                    }}
+                    disabled={!classWlSelect || addingClassWl}
+                    className="px-3 py-1.5 text-xs font-medium bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                  >
+                    {addingClassWl ? 'Adding...' : '+ Add'}
+                  </button>
+                </div>
+              </div>
 
               {/* Student Table */}
               {selectedClass.students && selectedClass.students.length > 0 ? (

@@ -18,6 +18,13 @@ export const curriculumWordLists = pgTable('curriculum_word_lists', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const classCurriculumConfigs = pgTable('class_curriculum_configs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  classId: uuid('class_id').notNull().references(() => classes.id),
+  wordlistId: uuid('wordlist_id').notNull().references(() => curriculumWordLists.id),
+  addedAt: timestamp('added_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const studentCurriculumConfigs = pgTable('student_curriculum_configs', {
   id: uuid('id').defaultRandom().primaryKey(),
   studentId: uuid('student_id').notNull().references(() => users.id),

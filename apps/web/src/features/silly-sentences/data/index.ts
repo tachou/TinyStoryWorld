@@ -97,8 +97,10 @@ export function selectRoundWordsWithCurriculum(
   const anchorWords = ANCHOR_WORDS[lang] || [];
   const anchors = resolveAnchors(all, anchorWords);
   const anchorIds = new Set(anchors.map((w) => w.id));
+  const curriculumWordSet = new Set(curriculumEntries.map((w) => w.word.toLowerCase()));
 
-  const selected: WordEntry[] = [...anchors];
+  // Tag anchors — mark as curriculum if they appear in the curriculum, otherwise leave untagged (they're structural)
+  const selected: WordEntry[] = anchors.map((w) => ({ ...w, fromCurriculum: true }));
   const remainingCount = count - anchors.length;
 
   // Separate curriculum entries by POS
@@ -135,6 +137,8 @@ export function selectRoundWordsWithCurriculum(
     const currAvailable = currByPos[pos].filter((w) => !usedIds.has(w.id));
     const fromCurr = weightedPick(currAvailable, desired, usageCounts);
     for (const w of fromCurr) usedIds.add(w.id);
+    // Tag curriculum words
+    const taggedCurr = fromCurr.map((w) => ({ ...w, fromCurriculum: true }));
 
     // Pad remaining slots from pool
     const needed = desired - fromCurr.length;
@@ -142,9 +146,11 @@ export function selectRoundWordsWithCurriculum(
       const poolAvailable = poolByPos[pos].filter((w) => !usedIds.has(w.id));
       const fromPool = weightedPick(poolAvailable, needed, usageCounts);
       for (const w of fromPool) usedIds.add(w.id);
-      randomSelected.push(...fromCurr, ...fromPool);
+      // Tag pool words as non-curriculum
+      const taggedPool = fromPool.map((w) => ({ ...w, fromCurriculum: false }));
+      randomSelected.push(...taggedCurr, ...taggedPool);
     } else {
-      randomSelected.push(...fromCurr);
+      randomSelected.push(...taggedCurr);
     }
   }
 
@@ -152,7 +158,9 @@ export function selectRoundWordsWithCurriculum(
   const totalNeeded = remainingCount - randomSelected.length;
   if (totalNeeded > 0) {
     const remaining = pool.filter((w) => !usedIds.has(w.id));
-    randomSelected.push(...weightedPick(remaining, totalNeeded, usageCounts));
+    const taggedRemaining = weightedPick(remaining, totalNeeded, usageCounts)
+      .map((w) => ({ ...w, fromCurriculum: false }));
+    randomSelected.push(...taggedRemaining);
   }
 
   selected.push(...randomSelected);

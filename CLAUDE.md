@@ -68,7 +68,7 @@ The preview server name is **`tsw`** (use this with `preview_start` tool). The s
 - **Battle Stories**: `/battle-stories` — build matchups, generate AI stories
 - **AI Stories**: `/stories` — theme-based AI story generation
 - **Teacher Dashboard**: `/dashboard` — classes, assignments, word lists, books, reports
-- **Teacher Classes**: `/dashboard/classes` — manage students, assign curriculum per student
+- **Teacher Classes**: `/dashboard/classes` — manage students, assign curriculum per student or per class
 - **Teacher Books**: `/dashboard/books` — bulk import/delete books
 - **Teacher Word Lists**: `/dashboard/word-lists` — create/manage curriculum word lists
 
@@ -135,7 +135,7 @@ TinyStoryWorld/
 │   │       ├── users.ts              # users, parentLinks
 │   │       ├── classes.ts            # classes, studentProfiles, readingStageEnum
 │   │       ├── books.ts              # books, bookPages, bookCurriculumScores, readingSessions, quizAttempts, assignments
-│   │       ├── curriculum.ts         # curriculumWordLists, studentCurriculumConfigs
+│   │       ├── curriculum.ts         # curriculumWordLists, studentCurriculumConfigs, classCurriculumConfigs
 │   │       ├── battle-stories.ts     # battleStories, storyVotes
 │   │       └── generated-stories.ts  # generatedStories
 │   ├── types/                        # Shared TypeScript types (Language, WordEntry, PartOfSpeech, etc.)
@@ -167,7 +167,8 @@ TinyStoryWorld/
 | `/api/classes/[id]` | GET, DELETE | Teacher+ | Class details with students / Delete |
 | `/api/classes/[id]/students` | POST, DELETE | Teacher+ | Add/remove students |
 | `/api/word-lists` | GET, POST | Any / Teacher+ | List/create curriculum word lists |
-| `/api/curriculum/active` | GET | Student | Get student's resolved active curriculum |
+| `/api/classes/[id]/curriculum` | GET, POST, DELETE | Teacher+ | List/add/remove word lists assigned to a class |
+| `/api/curriculum/active` | GET | Student | Get student's resolved active curriculum (student → class → default) |
 | `/api/students/[id]/curriculum` | GET, PUT | Teacher+ | View/assign curriculum to student |
 | `/api/student/stats` | GET | Student | Student profile stats + reading stage |
 | `/api/reading-sessions` | POST | Student | Log reading session |
@@ -185,14 +186,20 @@ TinyStoryWorld/
 
 ### Curriculum Flow
 1. Teacher creates word list at `/dashboard/word-lists`
-2. Teacher optionally assigns it to specific students at `/dashboard/classes` (Curriculum column)
-3. Student's store checks for teacher-assigned curriculum first, falls back to own word lists
+2. Teacher assigns word lists to classes at `/dashboard/classes` (Class Word Lists section) or to individual students (Curriculum column)
+3. **Resolution priority**: Student-level override → Class-level word lists (merged, deduplicated) → Student's own selection → Default pool
 4. When curriculum is active, modules prioritize those words:
-   - **Silly Sentences**: curriculum words fill POS slots first, padded from default pool
+   - **Silly Sentences**: curriculum words fill POS slots first, padded from default pool. Non-curriculum "bonus" words are visually distinguished with dashed borders, reduced opacity, and a "+" badge
    - **Battle Stories / AI Stories**: curriculum words injected into Claude prompt as soft vocabulary
    - **Quizzes**: curriculum words guide question focus
    - **Book Library**: coverage scores show how many curriculum words each book contains
 5. VocabularySpotlight shows matched/unmatched curriculum words after story generation
+
+### Class-Level Word Lists
+- Multiple word lists can be assigned to a single class via `classCurriculumConfigs` table
+- When a student belongs to a class with assigned word lists, they are merged (deduplicated by lowercase key)
+- Class curriculum is a fallback — student-level assignment takes precedence
+- API: `GET/POST/DELETE /api/classes/[id]/curriculum`
 
 ### Translation System (Battle Stories)
 - `fighters.ts` has translation maps: `FIGHTERS_FR`, `FIGHTERS_ZH`, `SETTINGS_FR`, `SETTINGS_ZH`, `TWISTS_FR`, `TWISTS_ZH`
@@ -207,8 +214,10 @@ TinyStoryWorld/
 
 ### Global Curriculum PRD (mostly complete)
 - [x] All module integrations done
-- [x] Teacher curriculum assignment UI
+- [x] Teacher curriculum assignment UI (student-level + class-level)
 - [x] POS auto-detection for uploads
+- [x] Class-level word list assignment with merged curriculum resolution
+- [x] Bonus word visual indicator in Silly Sentences (dashed border + "+" badge for non-curriculum words)
 - [ ] End-to-end testing of all curriculum integrations
 
 ### SEO & AI Discovery PRD (approved, not started)

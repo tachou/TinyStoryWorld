@@ -15,6 +15,8 @@ export interface WordEntry {
   pos: PartOfSpeech;
   lang: Language;
   phonetic?: string;
+  /** true = from the assigned curriculum word list, false/undefined = from default pool */
+  fromCurriculum?: boolean;
 }
 
 export interface WordTile extends WordEntry {

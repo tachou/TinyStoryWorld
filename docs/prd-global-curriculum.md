@@ -183,6 +183,10 @@ New component shown after a story is generated, showing matched/unmatched curric
 - [x] Add CurriculumBadge to each module header
 - [x] Teacher dashboard: student curriculum assignment view (in Classes page)
 - [x] POS auto-detection for CSV uploads without POS column (`posLookup.ts`)
+- [x] Class-level word list assignment (`classCurriculumConfigs` table, `/api/classes/[id]/curriculum`)
+- [x] Curriculum resolution priority: student → class (merged) → default
+- [x] Class Word Lists UI in teacher classes page (add/remove chips, combined word count)
+- [x] Bonus word indicator in Silly Sentences (dashed border + "+" badge for non-curriculum pool words)
 
 ### Remaining
 - [ ] Testing all module integrations end-to-end

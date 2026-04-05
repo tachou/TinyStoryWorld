@@ -27,7 +27,7 @@ import { useLanguageStore } from '@/stores/languageStore';
 
 // ─── Draggable Tile (word pool) ─────────────────────────────────────────
 
-function DraggablePoolTile({ tile }: { tile: WordTile }) {
+function DraggablePoolTile({ tile, hasCurriculum }: { tile: WordTile; hasCurriculum: boolean }) {
   const addToTray = useGameStore((s) => s.addToTray);
   const language = useGameStore((s) => s.language);
   const showPinyin = useGameStore((s) => s.showPinyin);
@@ -60,6 +60,7 @@ function DraggablePoolTile({ tile }: { tile: WordTile }) {
       showPinyin={showPinyin}
       showPos={showPos}
       isChinese={language === 'zh-Hans'}
+      hasCurriculum={hasCurriculum}
       style={style}
       aria-description="Click to add to sentence."
       {...attributes}
@@ -70,7 +71,7 @@ function DraggablePoolTile({ tile }: { tile: WordTile }) {
 
 // ─── Sortable Tray Tile ─────────────────────────────────────────────────
 
-function SortableTrayTile({ tile, index }: { tile: WordTile; index: number }) {
+function SortableTrayTile({ tile, index, hasCurriculum }: { tile: WordTile; index: number; hasCurriculum: boolean }) {
   const removeFromTray = useGameStore((s) => s.removeFromTray);
   const highlightedTileIndex = useGameStore((s) => s.highlightedTileIndex);
   const feedback = useGameStore((s) => s.feedback);
@@ -122,6 +123,7 @@ function SortableTrayTile({ tile, index }: { tile: WordTile; index: number }) {
       showPinyin={showPinyin}
       showPos={showPos}
       isChinese={language === 'zh-Hans'}
+      hasCurriculum={hasCurriculum}
       style={style}
       aria-description={`Word ${index + 1} of ${sentenceTray.length}. Click to remove.`}
       {...attributes}
@@ -148,6 +150,9 @@ function GameScreen() {
   const reorderTray = useGameStore((s) => s.reorderTray);
   const addToTray = useGameStore((s) => s.addToTray);
   const insertTileAt = useGameStore((s) => s.insertTileAt);
+
+  const activeWords = useLanguageStore((s) => s.activeWords);
+  const hasCurriculum = activeWords.length > 0;
 
   const locale = t(uiLanguage);
 
@@ -280,7 +285,7 @@ function GameScreen() {
                     className="w-14 h-12 md:w-16 md:h-14 rounded-xl border-2 border-dashed border-purple-400 bg-purple-100/50 flex-shrink-0 transition-all duration-200"
                   />
                 )}
-                <SortableTrayTile tile={tile} index={i} />
+                <SortableTrayTile tile={tile} index={i} hasCurriculum={hasCurriculum} />
               </Fragment>
             ))}
             {insertPreviewIndex !== null && insertPreviewIndex >= sentenceTray.length && (
@@ -343,7 +348,7 @@ function GameScreen() {
           <div className="flex flex-wrap gap-2 md:gap-3 justify-center p-4 bg-gray-50 rounded-2xl border border-gray-200 min-h-[120px]">
             {wordPool.length > 0 ? (
               wordPool.map((tile) => (
-                <DraggablePoolTile key={tile.instanceId} tile={tile} />
+                <DraggablePoolTile key={tile.instanceId} tile={tile} hasCurriculum={hasCurriculum} />
               ))
             ) : (
               <p className="text-gray-400 text-sm italic">{locale.allWordsUsed}</p>
@@ -361,6 +366,7 @@ function GameScreen() {
             showPinyin={useGameStore.getState().showPinyin}
             showPos={useGameStore.getState().showPos}
             isChinese={language === 'zh-Hans'}
+            hasCurriculum={hasCurriculum}
           />
         )}
       </DragOverlay>
