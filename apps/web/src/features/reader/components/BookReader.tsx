@@ -153,18 +153,21 @@ export function BookReader({ book, onClose, onSessionComplete, showTranslationTo
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-gray-800 truncate max-w-md">{book.title}</h2>
           {showTranslationToggle && !isEnglishBook && (
-            <button
-              onClick={() => setShowTranslation(!showTranslation)}
-              disabled={!currentPage.translationEn}
-              className={`text-xs font-medium px-3 py-1 rounded-full border transition-colors ${
-                showTranslation
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-              } disabled:opacity-30 disabled:cursor-not-allowed`}
-              title={currentPage.translationEn ? 'Toggle English translation' : 'No translation available for this page'}
-            >
-              {showTranslation ? 'English' : 'Original'}
-            </button>
+            currentPage.translationEn ? (
+              <button
+                onClick={() => setShowTranslation(!showTranslation)}
+                className={`text-xs font-medium px-3 py-1 rounded-full border transition-colors ${
+                  showTranslation
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                }`}
+                title="Toggle English translation"
+              >
+                {showTranslation ? 'English' : 'Original'}
+              </button>
+            ) : (
+              <span className="text-xs text-gray-400 italic">No translation</span>
+            )
           )}
         </div>
         <span className="text-sm text-gray-400">
