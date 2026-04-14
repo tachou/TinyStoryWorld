@@ -235,7 +235,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="pt-16 md:pt-0 md:ml-64 p-4 md:p-6">{children}</main>
+      <main className="pt-16 md:pt-8 md:ml-64 p-4 md:p-8">{children}</main>
     </div>
   );
 }
