@@ -74,7 +74,7 @@ The preview server name is **`tsw`** (use this with `preview_start` tool). The s
 - **Teacher Classes**: `/dashboard/classes` — manage students, assign curriculum per student or per class
 - **Teacher Books**: `/dashboard/books` — 4-step import wizard (JSON, images, curriculum, review), delete books, click title to preview
 - **Teacher Book Preview**: `/dashboard/books/preview?bookId=xxx` — read book as student sees it, translation toggle for non-English books
-- **Teacher Word Lists**: `/dashboard/word-lists` — create/manage curriculum word lists
+- **Teacher Word Lists**: `/dashboard/word-lists` — create/manage curriculum word lists; per-list "Public" toggle to share platform-wide with all students
 
 ### Verifying global controls
 1. Open the sidebar (hamburger menu on mobile)
@@ -149,6 +149,7 @@ TinyStoryWorld/
 │   └── ui/                           # Shared UI components
 ├── docs/
 │   ├── prd-global-curriculum.md      # Global curriculum feature PRD (mostly complete)
+│   ├── prd-public-word-lists.md      # Public word lists PRD (shipped v1)
 │   └── prd-seo-discovery.md          # SEO & AI discovery PRD (approved, not started)
 ├── TESTING_PLAN.md                   # Comprehensive test checklist
 └── CLAUDE.md                         # This file
@@ -172,7 +173,8 @@ TinyStoryWorld/
 | `/api/classes` | GET, POST | Teacher+ | List/create classes |
 | `/api/classes/[id]` | GET, DELETE | Teacher+ | Class details with students / Delete |
 | `/api/classes/[id]/students` | POST, DELETE | Teacher+ | Add/remove students |
-| `/api/word-lists` | GET, POST | Any / Teacher+ | List/create curriculum word lists |
+| `/api/word-lists` | GET, POST | Any / Teacher+ | List/create curriculum word lists (student GET also returns any list with `isPublic = true`) |
+| `/api/word-lists/[id]` | PATCH, DELETE | Teacher+ / Owner | Toggle `isPublic` (teacher/admin) / Delete own list |
 | `/api/classes/[id]/curriculum` | GET, POST, DELETE | Teacher+ | List/add/remove word lists assigned to a class |
 | `/api/curriculum/active` | GET | Student | Get student's resolved active curriculum (student → class → default) |
 | `/api/students/[id]/curriculum` | GET, PUT | Teacher+ | View/assign curriculum to student |
@@ -206,6 +208,12 @@ TinyStoryWorld/
 - When a student belongs to a class with assigned word lists, they are merged (deduplicated by lowercase key)
 - Class curriculum is a fallback — student-level assignment takes precedence
 - API: `GET/POST/DELETE /api/classes/[id]/curriculum`
+
+### Public Word Lists
+- Any teacher can flip `curriculum_word_lists.is_public = true` on their own list via the toggle on `/dashboard/word-lists`
+- `GET /api/word-lists` for a student returns: own lists ∪ lists owned by class teachers ∪ any public list (id-level de-dup)
+- `PATCH /api/word-lists/[id]` is teacher/admin-only; parents cannot publish (v1 scope)
+- See `docs/prd-public-word-lists.md`
 
 ### Translation System (Battle Stories)
 - `fighters.ts` has translation maps: `FIGHTERS_FR`, `FIGHTERS_ZH`, `SETTINGS_FR`, `SETTINGS_ZH`, `TWISTS_FR`, `TWISTS_ZH`

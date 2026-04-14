@@ -2,7 +2,7 @@
 
 **Project:** Tiny Story World
 **Date:** April 14, 2026
-**Status:** Draft
+**Status:** Shipped (v1) — commit `3741608`
 **Author:** Product
 
 ---
@@ -149,11 +149,18 @@ These can be surfaced later on `/dashboard` or `/admin` — no new logging infra
 
 ## 10. Rollout
 
-1. Schema migration (`is_public` column).
-2. API: `GET` filter update, new `PATCH` handler.
-3. Teacher UI: toggle + badge on `/dashboard/word-lists`.
+1. Schema migration (`is_public` column). ✅ pushed via `drizzle-kit push`
+2. API: `GET` filter update, new `PATCH` handler. ✅
+3. Teacher UI: toggle + badge on `/dashboard/word-lists`. ✅
 4. QA: log in as student without class enrollment, confirm a teacher's public list appears in the curriculum selector and filters as expected; confirm non-public lists remain invisible.
-5. Ship behind no flag — feature is opt-in per list, so default behavior is identical to today.
+5. Ship behind no flag — feature is opt-in per list, so default behavior is identical to today. ✅
+
+### Implementation notes (shipped v1)
+
+- `GET` uses `or(inArray(ownerId, …), eq(isPublic, true))` plus in-memory de-dup by row `id` — a public list owned by one of the student's class teachers would otherwise appear twice.
+- `PATCH` only accepts `{ isPublic: boolean }` and is teacher/admin-only; parent role is rejected with 403. Admins can flip visibility on any list; teachers only on their own.
+- UI toggle uses optimistic update with rollback on fetch failure.
+- Toggle default stays `off` — no existing lists were auto-published.
 
 ---
 
