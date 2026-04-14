@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { BookImportWizard } from '@/components/BookImportWizard';
 
 interface BookData {
@@ -180,7 +181,12 @@ export default function BooksPage() {
               className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 truncate">{book.title}</h3>
+                <Link
+                  href={`/dashboard/books/preview?bookId=${book.id}`}
+                  className="font-semibold text-gray-900 hover:text-indigo-600 truncate transition-colors"
+                >
+                  {book.title}
+                </Link>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                     {LANG_LABELS[book.language] || book.language}

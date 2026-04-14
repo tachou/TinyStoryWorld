@@ -72,7 +72,8 @@ The preview server name is **`tsw`** (use this with `preview_start` tool). The s
 - **AI Stories**: `/stories` — theme-based AI story generation
 - **Teacher Dashboard**: `/dashboard` — classes, assignments, word lists, books, reports
 - **Teacher Classes**: `/dashboard/classes` — manage students, assign curriculum per student or per class
-- **Teacher Books**: `/dashboard/books` — 4-step import wizard (JSON, images, curriculum, review), delete books
+- **Teacher Books**: `/dashboard/books` — 4-step import wizard (JSON, images, curriculum, review), delete books, click title to preview
+- **Teacher Book Preview**: `/dashboard/books/preview?bookId=xxx` — read book as student sees it, translation toggle for non-English books
 - **Teacher Word Lists**: `/dashboard/word-lists` — create/manage curriculum word lists
 
 ### Verifying global controls
@@ -240,5 +241,6 @@ Full plan at `docs/prd-seo-discovery.md`. Key items:
 - [x] 4-step import wizard: JSON input, per-page images (Supabase Storage), curriculum association, review
 - [x] English translation support: optional `translationEn` per page in JSON, Claude auto-backfill for missing translations
 - [x] Supabase Storage integration for page illustrations (`book-images` bucket)
+- [x] Teacher book preview: click book title on `/dashboard/books` to read as student, with English translation toggle
 - [ ] Consider AI-assisted book generation (using Claude to write leveled readers)
 - [ ] Book cover image upload/generation

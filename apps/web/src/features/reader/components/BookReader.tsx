@@ -9,6 +9,7 @@ interface BookPage {
   id: string;
   pageNumber: number;
   textContent: string;
+  translationEn?: string | null;
   illustrationUrl?: string | null;
   wordAlignments?: WordTiming[] | null;
   audioSegment?: { start: number; end: number } | null;
@@ -27,14 +28,18 @@ interface BookReaderProps {
   book: BookData;
   onClose?: () => void;
   onSessionComplete?: (pagesRead: number, durationSeconds: number) => void;
+  showTranslationToggle?: boolean;
+  backLabel?: string;
 }
 
 const PLAYBACK_RATES = [0.5, 0.75, 1.0, 1.25];
 
-export function BookReader({ book, onClose, onSessionComplete }: BookReaderProps) {
+export function BookReader({ book, onClose, onSessionComplete, showTranslationToggle, backLabel }: BookReaderProps) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [sessionStart] = useState(() => Date.now());
+  const [showTranslation, setShowTranslation] = useState(false);
   const lang = book.language as Language;
+  const isEnglishBook = book.language === 'en';
 
   const {
     isPlaying,
@@ -89,9 +94,10 @@ export function BookReader({ book, onClose, onSessionComplete }: BookReaderProps
 
   const handleWordClick = useCallback((word: string) => {
     if (!isPlaying) {
-      speakWord(word, lang, false);
+      const ttsLang: Language = (showTranslation && currentPage?.translationEn) ? 'en' : lang;
+      speakWord(word, ttsLang, false);
     }
-  }, [isPlaying, lang]);
+  }, [isPlaying, showTranslation, currentPage, lang]);
 
   // Auto-play in Listen mode when page changes
   useEffect(() => {
@@ -126,8 +132,13 @@ export function BookReader({ book, onClose, onSessionComplete }: BookReaderProps
 
   if (!currentPage) return null;
 
+  // When translation toggle is on, show English text and use English for TTS
+  const displayingTranslation = showTranslation && !!currentPage.translationEn;
+  const displayText = displayingTranslation ? currentPage.translationEn! : currentPage.textContent;
+  const displayLang: Language = displayingTranslation ? 'en' : lang;
+
   // Split text into words for rendering
-  const words = splitIntoWords(currentPage.textContent, lang);
+  const words = splitIntoWords(displayText, displayLang);
 
   return (
     <div className="flex flex-col h-[calc(100vh-120px)] bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -137,9 +148,25 @@ export function BookReader({ book, onClose, onSessionComplete }: BookReaderProps
           onClick={handleClose}
           className="text-sm text-gray-500 hover:text-gray-700 font-medium"
         >
-          {'\u2190'} Back to Library
+          {'\u2190'} {backLabel || 'Back to Library'}
         </button>
-        <h2 className="text-lg font-bold text-gray-800 truncate max-w-md">{book.title}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-bold text-gray-800 truncate max-w-md">{book.title}</h2>
+          {showTranslationToggle && !isEnglishBook && (
+            <button
+              onClick={() => setShowTranslation(!showTranslation)}
+              disabled={!currentPage.translationEn}
+              className={`text-xs font-medium px-3 py-1 rounded-full border transition-colors ${
+                showTranslation
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+              } disabled:opacity-30 disabled:cursor-not-allowed`}
+              title={currentPage.translationEn ? 'Toggle English translation' : 'No translation available for this page'}
+            >
+              {showTranslation ? 'English' : 'Original'}
+            </button>
+          )}
+        </div>
         <span className="text-sm text-gray-400">
           {currentPageIndex + 1} / {totalPages}
         </span>
@@ -162,7 +189,7 @@ export function BookReader({ book, onClose, onSessionComplete }: BookReaderProps
           {/* Text with word highlighting */}
           <div className="text-xl md:text-2xl leading-relaxed text-gray-800 font-serif">
             {words.map((word, i) => {
-              const isHighlighted = currentWordIndex === i;
+              const isHighlighted = !displayingTranslation && currentWordIndex === i;
               const isWhitespace = /^\s+$/.test(word);
 
               if (isWhitespace) {
