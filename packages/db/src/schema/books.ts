@@ -38,6 +38,7 @@ export const bookPages = pgTable('book_pages', {
   bookId: uuid('book_id').notNull().references(() => books.id),
   pageNumber: integer('page_number').notNull(),
   textContent: text('text_content').notNull(),
+  translationEn: text('translation_en'),
   illustrationUrl: text('illustration_url'),
   vocabWords: jsonb('vocab_words').$type<string[]>(),
   /** Per-word timing alignment for karaoke highlighting */

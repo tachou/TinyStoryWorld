@@ -8,6 +8,7 @@ const MAX_BOOKS_PER_REQUEST = 50;
 
 interface PageInput {
   text: string;
+  translationEn?: string;
 }
 
 interface BookInput {
@@ -147,6 +148,7 @@ export async function POST(req: NextRequest) {
             bookId: newBook.id,
             pageNumber: idx + 1,
             textContent: page.text.trim(),
+            translationEn: page.translationEn?.trim() || null,
           }))
         );
 

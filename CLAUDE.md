@@ -41,7 +41,10 @@ The preview server name is **`tsw`** (use this with `preview_start` tool). The s
 - `DATABASE_URL` — Supabase PostgreSQL direct connection
 - `NEXTAUTH_SECRET` — Session encryption key
 - `NEXTAUTH_URL` — `http://localhost:3000`
-- `ANTHROPIC_API_KEY` — Claude API key for AI story/quiz generation (may be empty in dev)
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL (for Storage)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key (for client-side)
+- `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key (for server-side storage uploads)
+- `ANTHROPIC_API_KEY` — Claude API key for AI story/quiz generation and translation backfill (may be empty in dev)
 
 ## Test Accounts
 
@@ -69,7 +72,7 @@ The preview server name is **`tsw`** (use this with `preview_start` tool). The s
 - **AI Stories**: `/stories` — theme-based AI story generation
 - **Teacher Dashboard**: `/dashboard` — classes, assignments, word lists, books, reports
 - **Teacher Classes**: `/dashboard/classes` — manage students, assign curriculum per student or per class
-- **Teacher Books**: `/dashboard/books` — bulk import/delete books
+- **Teacher Books**: `/dashboard/books` — 4-step import wizard (JSON, images, curriculum, review), delete books
 - **Teacher Word Lists**: `/dashboard/word-lists` — create/manage curriculum word lists
 
 ### Verifying global controls
@@ -157,7 +160,9 @@ TinyStoryWorld/
 | `/api/auth/*` | GET/POST | — | NextAuth endpoints |
 | `/api/books` | GET | Any | List books (filterable by language/stage) |
 | `/api/books/[id]` | GET, DELETE | Any / Teacher+ | Get book with pages / Delete book |
-| `/api/books/bulk` | POST | Teacher+ | Bulk import books from JSON |
+| `/api/books/bulk` | POST | Teacher+ | Bulk import books from JSON (supports translationEn per page) |
+| `/api/books/upload-image` | POST | Teacher+ | Upload page illustration to Supabase Storage (multipart/form-data) |
+| `/api/books/translate` | POST | Teacher+ | Auto-generate English translations for book pages via Claude |
 | `/api/books/curriculum-scores` | GET, POST | Any | Curriculum coverage scores |
 | `/api/battle-stories` | GET, POST | Any | List/create battle stories |
 | `/api/battle-stories/[id]` | GET | Any | Get single battle story |
@@ -232,5 +237,8 @@ Full plan at `docs/prd-seo-discovery.md`. Key items:
 
 ### Book Library
 - [x] Bulk JSON import endpoint + teacher UI
+- [x] 4-step import wizard: JSON input, per-page images (Supabase Storage), curriculum association, review
+- [x] English translation support: optional `translationEn` per page in JSON, Claude auto-backfill for missing translations
+- [x] Supabase Storage integration for page illustrations (`book-images` bucket)
 - [ ] Consider AI-assisted book generation (using Claude to write leveled readers)
 - [ ] Book cover image upload/generation

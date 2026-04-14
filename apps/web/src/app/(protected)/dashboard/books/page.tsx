@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { BookImportWizard } from '@/components/BookImportWizard';
 
 interface BookData {
   id: string;
@@ -36,48 +37,13 @@ const LANG_LABELS: Record<string, string> = {
   'zh-Hans': 'Chinese',
 };
 
-const SAMPLE_JSON = `{
-  "books": [
-    {
-      "title": "The Big Cat",
-      "language": "en",
-      "stage": "emergent",
-      "description": "A story about a big cat.",
-      "genre": "fiction",
-      "themes": ["animals"],
-      "pages": [
-        { "text": "The cat is big." },
-        { "text": "The cat can run." },
-        { "text": "The big cat is happy!" }
-      ]
-    },
-    {
-      "title": "Le petit chien",
-      "language": "fr",
-      "stage": "beginner",
-      "description": "Un petit chien dans le jardin.",
-      "genre": "fiction",
-      "themes": ["animaux"],
-      "pages": [
-        { "text": "Le petit chien est dans le jardin." },
-        { "text": "Il court vite!" },
-        { "text": "Le chien est content." }
-      ]
-    }
-  ]
-}`;
 
 export default function BooksPage() {
   const [allBooks, setAllBooks] = useState<BookData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
-  const [jsonText, setJsonText] = useState('');
-  const [importing, setImporting] = useState(false);
-  const [importError, setImportError] = useState<string | null>(null);
-  const [importResult, setImportResult] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Set<string>>(new Set());
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [showSample, setShowSample] = useState(false);
 
   // Filters
   const [filterLang, setFilterLang] = useState('all');
@@ -100,55 +66,6 @@ export default function BooksPage() {
   useEffect(() => {
     fetchBooks();
   }, [fetchBooks]);
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setJsonText(ev.target?.result as string);
-      setImportError(null);
-    };
-    reader.readAsText(file);
-  };
-
-  const handleImport = async () => {
-    if (!jsonText.trim()) return;
-    setImporting(true);
-    setImportError(null);
-    setImportResult(null);
-
-    try {
-      let parsed: any;
-      try {
-        parsed = JSON.parse(jsonText);
-      } catch {
-        setImportError('Invalid JSON. Please check the format and try again.');
-        setImporting(false);
-        return;
-      }
-
-      const res = await fetch('/api/books/bulk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsed),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setImportResult(`Successfully imported ${data.imported} book${data.imported > 1 ? 's' : ''}!`);
-        setJsonText('');
-        fetchBooks();
-      } else {
-        const details = data.details ? '\n' + data.details.join('\n') : '';
-        setImportError(`${data.error}${details}`);
-      }
-    } catch (err) {
-      setImportError('Network error. Please try again.');
-    } finally {
-      setImporting(false);
-    }
-  };
 
   const handleDelete = async (bookId: string) => {
     if (confirmDelete !== bookId) {
@@ -190,98 +107,19 @@ export default function BooksPage() {
           </p>
         </div>
         <button
-          onClick={() => { setShowImport(!showImport); setImportError(null); setImportResult(null); }}
+          onClick={() => setShowImport(!showImport)}
           className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
         >
           {showImport ? 'Close Import' : '+ Import Books'}
         </button>
       </div>
 
-      {/* Import Form */}
+      {/* Import Wizard */}
       {showImport && (
-        <div className="mb-6 p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-          <h2 className="text-lg font-semibold mb-2">Bulk Import Books</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            Paste JSON or upload a .json file. Each book needs a title, language, stage, and pages.
-          </p>
-
-          {/* Sample format toggle */}
-          <button
-            onClick={() => setShowSample(!showSample)}
-            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium mb-3"
-          >
-            {showSample ? 'Hide sample format' : 'Show sample format'}
-          </button>
-
-          {showSample && (
-            <div className="mb-4 relative">
-              <pre className="bg-gray-900 text-green-400 text-xs p-4 rounded-lg overflow-x-auto max-h-80">
-                {SAMPLE_JSON}
-              </pre>
-              <button
-                onClick={() => setJsonText(SAMPLE_JSON)}
-                className="absolute top-2 right-2 px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600"
-              >
-                Use Sample
-              </button>
-            </div>
-          )}
-
-          {/* File upload */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Upload .json file
-            </label>
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-            />
-          </div>
-
-          {/* JSON textarea */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Or paste JSON
-            </label>
-            <textarea
-              value={jsonText}
-              onChange={(e) => { setJsonText(e.target.value); setImportError(null); }}
-              placeholder='{"books": [{"title": "...", "language": "en", "stage": "emergent", "pages": [{"text": "..."}]}]}'
-              rows={10}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-
-          {/* Import result / error */}
-          {importResult && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 font-medium">
-              {importResult}
-            </div>
-          )}
-          {importError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 whitespace-pre-wrap">
-              {importError}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleImport}
-              disabled={importing || !jsonText.trim()}
-              className="px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
-            >
-              {importing ? 'Importing...' : 'Import Books'}
-            </button>
-            <button
-              onClick={() => { setShowImport(false); setImportError(null); setImportResult(null); }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <BookImportWizard
+          onClose={() => setShowImport(false)}
+          onImported={fetchBooks}
+        />
       )}
 
       {/* Filters */}
