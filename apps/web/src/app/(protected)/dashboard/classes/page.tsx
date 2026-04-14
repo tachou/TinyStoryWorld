@@ -48,7 +48,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 const STAGE_COLORS: Record<string, string> = {
   emergent: 'bg-green-100 text-green-700',
-  beginner: 'bg-blue-100 text-blue-700',
+  beginner: 'bg-primary-100 text-primary-700',
   in_transition: 'bg-yellow-100 text-yellow-700',
   competent: 'bg-purple-100 text-purple-700',
   experienced: 'bg-red-100 text-red-700',
@@ -302,7 +302,7 @@ export default function ClassesPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -311,12 +311,12 @@ export default function ClassesPage() {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Classes</h1>
+          <h1 className="text-2xl font-bold ">My Classes</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your classes and students</p>
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
         >
           + New Class
         </button>
@@ -371,7 +371,7 @@ export default function ClassesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                 >
                   Create Class
                 </button>
@@ -397,7 +397,7 @@ export default function ClassesPage() {
                 onClick={() => fetchClassDetails(cls.id)}
                 className={`w-full text-left p-4 rounded-xl border transition-all ${
                   selectedClass?.id === cls.id
-                    ? 'border-indigo-400 bg-indigo-50 shadow-md'
+                    ? 'border-primary-400 bg-primary-50 shadow-md'
                     : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                 }`}
               >
@@ -461,7 +461,7 @@ export default function ClassesPage() {
                     </div>
                     <button
                       type="submit"
-                      className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                     >
                       Add
                     </button>
@@ -621,7 +621,7 @@ export default function ClassesPage() {
                               ))}
                             </select>
                             {savingCurriculum === student.userId && (
-                              <span className="ml-1 text-[10px] text-indigo-500">Saving...</span>
+                              <span className="ml-1 text-[10px] text-primary-500">Saving...</span>
                             )}
                           </td>
                           <td className="py-3 px-3 text-gray-600">{student.totalBooksRead}</td>

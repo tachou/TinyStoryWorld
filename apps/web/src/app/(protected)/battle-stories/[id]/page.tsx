@@ -216,7 +216,7 @@ export default function BattleStoryReaderPage() {
           {'\u2190'} Back
         </button>
         <div className="flex-1 text-center">
-          <h1 className="text-xl font-bold text-gray-900">{story.title}</h1>
+          <h1 className="text-xl font-bold ">{story.title}</h1>
           <p className="text-xs text-gray-400">
             {story.matchup.numberA} {story.matchup.fighterA} vs{' '}
             {story.matchup.numberB} {story.matchup.fighterB} in{' '}
@@ -278,7 +278,7 @@ export default function BattleStoryReaderPage() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               speaking
                 ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'
+                : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
             }`}
           >
             {speaking ? '\u23F9 Stop' : '\u{1F50A} Listen'}

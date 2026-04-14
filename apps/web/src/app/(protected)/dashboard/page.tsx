@@ -43,7 +43,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-3xl font-bold text-gray-900">Teacher Dashboard</h1>
+      <h1 className="text-3xl font-bold ">Teacher Dashboard</h1>
       <p className="mt-2 text-lg text-gray-600">Welcome back, {name}!</p>
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2">
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
             className="group rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all"
           >
             <span className="text-3xl">{card.icon}</span>
-            <h2 className="mt-3 text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+            <h2 className="mt-3 text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
               {card.title}
             </h2>
             <p className="mt-1 text-sm text-gray-600">{card.description}</p>

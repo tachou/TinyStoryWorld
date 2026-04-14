@@ -40,7 +40,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 const STAGE_COLORS: Record<string, string> = {
   emergent: 'bg-green-100 text-green-700',
-  beginner: 'bg-blue-100 text-blue-700',
+  beginner: 'bg-primary-100 text-primary-700',
   in_transition: 'bg-yellow-100 text-yellow-700',
   competent: 'bg-purple-100 text-purple-700',
   experienced: 'bg-red-100 text-red-700',
@@ -74,7 +74,7 @@ function BookCard({
       className="group bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1"
     >
       {/* Cover */}
-      <div className="h-40 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center relative">
+      <div className="h-40 bg-gradient-to-br from-primary-100 to-purple-100 flex items-center justify-center relative">
         {book.coverImageUrl ? (
           <img
             src={book.coverImageUrl}
@@ -94,7 +94,7 @@ function BookCard({
 
       {/* Info */}
       <div className="p-3">
-        <h3 className="font-semibold text-gray-900 text-sm truncate group-hover:text-indigo-600 transition-colors">
+        <h3 className="font-semibold text-gray-900 text-sm truncate group-hover:text-primary-600 transition-colors">
           {book.title}
         </h3>
         <div className="flex items-center gap-2 mt-2">
@@ -253,7 +253,7 @@ export default function LibraryPage() {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold ">
             {'\u{1F4D6}'} Book Library
           </h1>
           <CurriculumBadge />
@@ -315,7 +315,7 @@ export default function LibraryPage() {
                 <button
                   onClick={handleCompute}
                   disabled={computing}
-                  className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors shrink-0"
+                  className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors shrink-0"
                 >
                   {computing ? 'Computing...' : '\u{1F504} Scan Books'}
                 </button>
@@ -329,7 +329,7 @@ export default function LibraryPage() {
                   <label className="text-xs font-medium text-gray-500">
                     Coverage Threshold
                   </label>
-                  <span className="text-xs font-bold text-indigo-600">
+                  <span className="text-xs font-bold text-primary-600">
                     {Math.round(threshold * 100)}%
                   </span>
                 </div>
@@ -340,7 +340,7 @@ export default function LibraryPage() {
                   step={5}
                   value={threshold * 100}
                   onChange={(e) => setThreshold(Number(e.target.value) / 100)}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
                   <span>50%</span>
@@ -367,7 +367,7 @@ export default function LibraryPage() {
       {/* Main Book Grid */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
         </div>
       ) : mainBooks.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-xl border border-gray-200">

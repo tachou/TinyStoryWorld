@@ -96,7 +96,7 @@ export default function ModerationPage() {
     <div className="mx-auto max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold ">
             {'\u{1F6E1}\uFE0F'} Content Moderation
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -119,7 +119,7 @@ export default function ModerationPage() {
               onClick={() => setFilter(t)}
               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                 filter === t
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-primary-600 text-white'
                   : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -135,7 +135,7 @@ export default function ModerationPage() {
               onClick={() => setStatusFilter(s)}
               className={`px-3 py-2 text-sm font-medium rounded-lg capitalize transition-colors ${
                 statusFilter === s
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-primary-600 text-white'
                   : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -156,9 +156,9 @@ export default function ModerationPage() {
             <p className="text-2xl font-black text-purple-700">{stats.battlePending}</p>
             <p className="text-xs text-purple-600">Battle Stories</p>
           </div>
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-center">
-            <p className="text-2xl font-black text-indigo-700">{stats.aiPending}</p>
-            <p className="text-xs text-indigo-600">AI Stories</p>
+          <div className="bg-primary-50 border border-primary-200 rounded-xl p-3 text-center">
+            <p className="text-2xl font-black text-primary-700">{stats.aiPending}</p>
+            <p className="text-xs text-primary-600">AI Stories</p>
           </div>
         </div>
       )}
@@ -166,7 +166,7 @@ export default function ModerationPage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-16">
-          <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
         </div>
       )}
 
@@ -255,7 +255,7 @@ export default function ModerationPage() {
                   <p className="text-sm text-gray-600 leading-relaxed">
                     {expandedId === item.id ? item.preview : item.preview.substring(0, 120) + '...'}
                   </p>
-                  <span className="text-xs text-indigo-500 font-medium mt-1 inline-block">
+                  <span className="text-xs text-primary-500 font-medium mt-1 inline-block">
                     {expandedId === item.id ? 'Show less' : 'Show more'}
                   </span>
                 </div>

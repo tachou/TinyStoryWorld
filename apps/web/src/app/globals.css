@@ -65,6 +65,11 @@
     font-family: var(--font-heading);
     font-weight: 600;
   }
+  /* Brand-accent H1 color matches tinystoryworld.com */
+  h1 {
+    color: var(--color-primary-500);
+    font-weight: 700;
+  }
 }
 
 @layer components {

@@ -323,13 +323,13 @@ export function BookImportWizard({ onClose, onImported }: Props) {
                 step > i + 1
                   ? 'bg-green-500 text-white'
                   : step === i + 1
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-primary-600 text-white'
                   : 'bg-gray-200 text-gray-500'
               }`}
             >
               {step > i + 1 ? '\u2713' : i + 1}
             </div>
-            <span className={`text-sm font-medium ${step === i + 1 ? 'text-indigo-700' : 'text-gray-400'}`}>
+            <span className={`text-sm font-medium ${step === i + 1 ? 'text-primary-700' : 'text-gray-400'}`}>
               {label}
             </span>
             {i < STEP_LABELS.length - 1 && <div className="w-6 h-px bg-gray-300" />}
@@ -347,7 +347,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
 
           <button
             onClick={() => setShowSample(!showSample)}
-            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium mb-3"
+            className="text-sm text-primary-600 hover:text-primary-800 font-medium mb-3"
           >
             {showSample ? 'Hide sample format' : 'Show sample format'}
           </button>
@@ -372,7 +372,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
               type="file"
               accept=".json"
               onChange={handleFileUpload}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
             />
           </div>
 
@@ -383,7 +383,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
               onChange={(e) => { setJsonText(e.target.value); setParseError(null); }}
               placeholder='{"books": [{"title": "...", "language": "fr", "stage": "beginner", "pages": [{"text": "...", "translationEn": "..."}]}]}'
               rows={10}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
 
@@ -397,7 +397,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
             <button
               onClick={handleParseAndNext}
               disabled={!jsonText.trim()}
-              className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
             >
               Next
             </button>
@@ -453,7 +453,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
             </button>
             <button
               onClick={() => setStep(3)}
-              className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+              className="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
             >
               {totalImages > 0 ? `Next (${totalImages} image${totalImages > 1 ? 's' : ''})` : 'Skip'}
             </button>
@@ -471,7 +471,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
 
           {wlLoading ? (
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-              <div className="animate-spin w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full" />
+              <div className="animate-spin w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full" />
               Loading word lists...
             </div>
           ) : filteredWordLists.length === 0 ? (
@@ -501,7 +501,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
             </button>
             <button
               onClick={() => setStep(4)}
-              className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+              className="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
             >
               {selectedWordlistId ? 'Next' : 'Skip'}
             </button>
@@ -553,12 +553,12 @@ export function BookImportWizard({ onClose, onImported }: Props) {
           {isImporting && (
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
-                <div className="animate-spin w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full" />
+                <div className="animate-spin w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full" />
                 <span className="text-sm text-gray-600">{importPhase}</span>
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-indigo-600 transition-all duration-300"
+                  className="h-full bg-primary-600 transition-all duration-300"
                   style={{ width: `${importTotal > 0 ? (importProgress / importTotal) * 100 : 0}%` }}
                 />
               </div>
@@ -603,7 +603,7 @@ export function BookImportWizard({ onClose, onImported }: Props) {
             ) : (
               <button
                 onClick={() => { onImported(); onClose(); }}
-                className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Done
               </button>

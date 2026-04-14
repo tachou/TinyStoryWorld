@@ -17,7 +17,7 @@ interface WordList {
 }
 
 const POS_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  noun: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'N' },
+  noun: { bg: 'bg-primary-100', text: 'text-primary-700', label: 'N' },
   verb: { bg: 'bg-green-100', text: 'text-green-700', label: 'V' },
   adjective: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'ADJ' },
   adverb: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'ADV' },
@@ -144,10 +144,10 @@ export default function WordListsPage() {
   return (
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Word Lists</h1>
+        <h1 className="text-2xl font-bold ">Word Lists</h1>
         <button
           onClick={() => setShowUpload(!showUpload)}
-          className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
         >
           + New Word List
         </button>
@@ -167,7 +167,7 @@ export default function WordListsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Week 5 Vocabulary"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
             <div>
@@ -177,7 +177,7 @@ export default function WordListsPage() {
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="en">English</option>
                 <option value="fr">French</option>
@@ -194,7 +194,7 @@ export default function WordListsPage() {
               onChange={(e) => setCsvText(e.target.value)}
               placeholder={`# One word per line: word,pos,phonetic\ncat,noun\nruns,verb\nbig,adjective\nquickly,adverb`}
               rows={8}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
           <div className="flex gap-3">
@@ -240,7 +240,7 @@ export default function WordListsPage() {
               <div
                 key={list.id}
                 className={`bg-white rounded-xl border shadow-sm transition-all ${
-                  isExpanded ? 'border-indigo-300 shadow-md' : 'border-gray-200 hover:shadow-md'
+                  isExpanded ? 'border-primary-300 shadow-md' : 'border-gray-200 hover:shadow-md'
                 }`}
               >
                 {/* Header — always visible, clickable */}
@@ -260,7 +260,7 @@ export default function WordListsPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-700">
                       {list.words.length} words
                     </span>
                     <svg
@@ -291,7 +291,7 @@ export default function WordListsPage() {
                           e.stopPropagation();
                           setShowAllWords(true);
                         }}
-                        className="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                        className="mt-2 text-xs text-primary-600 hover:text-primary-800 font-medium"
                       >
                         Show all ({list.words.length})
                       </button>
@@ -302,7 +302,7 @@ export default function WordListsPage() {
                           e.stopPropagation();
                           setShowAllWords(false);
                         }}
-                        className="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                        className="mt-2 text-xs text-primary-600 hover:text-primary-800 font-medium"
                       >
                         Show fewer
                       </button>

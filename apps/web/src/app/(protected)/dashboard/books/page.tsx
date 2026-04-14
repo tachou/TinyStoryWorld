@@ -26,7 +26,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 const STAGE_COLORS: Record<string, string> = {
   emergent: 'bg-green-100 text-green-700',
-  beginner: 'bg-blue-100 text-blue-700',
+  beginner: 'bg-primary-100 text-primary-700',
   in_transition: 'bg-yellow-100 text-yellow-700',
   competent: 'bg-purple-100 text-purple-700',
   experienced: 'bg-red-100 text-red-700',
@@ -102,14 +102,14 @@ export default function BooksPage() {
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Book Library</h1>
+          <h1 className="text-2xl font-bold ">Book Library</h1>
           <p className="text-sm text-gray-500 mt-1">
             Import, browse, and manage books for your students
           </p>
         </div>
         <button
           onClick={() => setShowImport(!showImport)}
-          className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
         >
           {showImport ? 'Close Import' : '+ Import Books'}
         </button>
@@ -159,7 +159,7 @@ export default function BooksPage() {
       {/* Book list */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
         </div>
       ) : filteredBooks.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
@@ -183,7 +183,7 @@ export default function BooksPage() {
               <div className="flex-1 min-w-0">
                 <Link
                   href={`/dashboard/books/preview?bookId=${book.id}`}
-                  className="font-semibold text-gray-900 hover:text-indigo-600 truncate transition-colors"
+                  className="font-semibold text-gray-900 hover:text-primary-600 truncate transition-colors"
                 >
                   {book.title}
                 </Link>

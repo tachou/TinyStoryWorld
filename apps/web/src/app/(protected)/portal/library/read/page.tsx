@@ -119,7 +119,7 @@ function ReadPageContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -130,7 +130,7 @@ function ReadPageContent() {
         <p className="text-gray-500 text-lg">{error || 'Something went wrong'}</p>
         <button
           onClick={handleClose}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           Back to Library
         </button>
@@ -190,7 +190,7 @@ export default function ReadPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
         </div>
       }
     >

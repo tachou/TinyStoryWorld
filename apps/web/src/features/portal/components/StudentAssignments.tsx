@@ -20,7 +20,7 @@ const TYPE_CONFIG: Record<string, { icon: string; label: string; color: string; 
   book: {
     icon: '\u{1F4D6}',
     label: 'Read',
-    color: 'bg-blue-100 text-blue-700 border-blue-200',
+    color: 'bg-primary-100 text-primary-700 border-primary-200',
     href: (a) => `/portal/library/read?bookId=${a.bookId}`,
   },
   'silly-sentences': {
@@ -64,7 +64,7 @@ export function StudentAssignments() {
   if (loading) {
     return (
       <div className="flex justify-center py-8">
-        <div className="animate-spin w-6 h-6 border-3 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-6 h-6 border-3 border-primary-600 border-t-transparent rounded-full" />
       </div>
     );
   }

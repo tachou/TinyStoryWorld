@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
@@ -81,7 +82,7 @@ function LanguageSelector() {
             onClick={() => setLanguage(lang)}
             className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-lg text-xs font-medium transition-all ${
               language === lang
-                ? 'bg-indigo-100 text-indigo-700 ring-2 ring-indigo-300'
+                ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-300'
                 : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700'
             }`}
             title={lang === 'en' ? 'English' : lang === 'fr' ? 'French' : 'Chinese'}
@@ -105,8 +106,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     <>
       <div className="border-b border-gray-200 px-6 py-5">
         <Link href="/" className="flex items-center gap-2" onClick={onNavigate}>
-          <span className="text-2xl">{'\u{1F4DA}'}</span>
-          <span className="text-xl font-bold text-gray-900">
+          <Image
+            src="/favicon.png"
+            alt="Tiny Story World"
+            width={32}
+            height={32}
+            priority
+            className="rounded-md"
+          />
+          <span className="font-fredoka text-xl font-bold text-gray-900">
             Tiny Story World
           </span>
         </Link>
@@ -124,7 +132,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   onClick={onNavigate}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-indigo-50 text-indigo-700'
+                      ? 'bg-primary-50 text-primary-700'
                       : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
@@ -146,7 +154,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             {session?.user?.name ?? 'User'}
           </p>
           {role && (
-            <span className="mt-1 inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium capitalize text-indigo-700">
+            <span className="mt-1 inline-block rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium capitalize text-primary-700">
               {role}
             </span>
           )}
@@ -164,7 +172,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 function MobileHeader({ onMenuToggle }: { onMenuToggle: () => void }) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 md:hidden">
+    <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b border-primary-100 bg-surface-soft px-4 py-3 md:hidden">
       <button
         onClick={onMenuToggle}
         className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
@@ -175,8 +183,15 @@ function MobileHeader({ onMenuToggle }: { onMenuToggle: () => void }) {
         </svg>
       </button>
       <Link href="/" className="flex items-center gap-2">
-        <span className="text-xl">{'\u{1F4DA}'}</span>
-        <span className="text-lg font-bold text-gray-900">Tiny Story World</span>
+        <Image
+          src="/favicon.png"
+          alt="Tiny Story World"
+          width={28}
+          height={28}
+          priority
+          className="rounded-md"
+        />
+        <span className="font-fredoka text-lg font-bold text-gray-900">Tiny Story World</span>
       </Link>
       <div className="w-10" />
     </header>
@@ -193,7 +208,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       {/* Mobile header */}
       <MobileHeader onMenuToggle={() => setMobileOpen((o) => !o)} />
 
@@ -207,7 +222,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile drawer */}
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col bg-white shadow-xl transition-transform duration-300 md:hidden ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col bg-surface-soft shadow-xl transition-transform duration-300 md:hidden ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -215,7 +230,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 flex-col border-r border-gray-200 bg-white">
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 flex-col border-r border-primary-100 bg-surface-soft">
         <SidebarContent />
       </aside>
 

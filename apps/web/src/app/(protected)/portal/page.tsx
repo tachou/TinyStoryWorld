@@ -63,7 +63,7 @@ function LevelBadge({ level }: { level: number }) {
   const colors = [
     'from-gray-400 to-gray-500',
     'from-green-400 to-emerald-500',
-    'from-blue-400 to-indigo-500',
+    'from-primary-400 to-primary-500',
     'from-purple-400 to-violet-500',
     'from-amber-400 to-orange-500',
     'from-rose-400 to-pink-500',
@@ -92,7 +92,7 @@ function XPBar({ progress, xp, xpForNext }: { progress: number; xp: number; xpFo
       </div>
       <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
+          className="h-full bg-gradient-to-r from-primary-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${Math.min(progress * 100, 100)}%` }}
         />
       </div>
@@ -200,7 +200,7 @@ function RecentBadges({ badges }: { badges: Badge[] }) {
         </h3>
         <Link
           href="/portal/badges"
-          className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+          className="text-xs text-primary-600 hover:text-primary-700 font-medium"
         >
           View all {'\u2192'}
         </Link>
@@ -261,7 +261,7 @@ export default function PortalPage() {
       icon: '\u{1F4D6}',
       title: 'Book Library',
       description: 'Browse and read books.',
-      color: 'border-blue-200 hover:border-blue-300 bg-blue-50/50',
+      color: 'border-primary-200 hover:border-primary-300 bg-primary-50/50',
     },
     {
       href: '/silly-sentences',
@@ -289,7 +289,7 @@ export default function PortalPage() {
   return (
     <div className="mx-auto max-w-5xl">
       {/* Hero Section with Level */}
-      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl p-6 text-white mb-6 shadow-lg">
+      <div className="bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 rounded-2xl p-6 text-white mb-6 shadow-lg">
         <div className="flex items-center gap-5">
           {stats ? (
             <LevelBadge level={stats.level} />
@@ -336,7 +336,7 @@ export default function PortalPage() {
             label="Pages Read"
             value={stats.reading.totalPages}
             sub={`${stats.reading.uniqueBooks} books`}
-            color="bg-blue-50 border-blue-200"
+            color="bg-primary-50 border-primary-200"
           />
           <StatCard
             icon={'\u23F1\uFE0F'}
@@ -379,7 +379,7 @@ export default function PortalPage() {
             className={`group rounded-xl border p-4 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all ${link.color}`}
           >
             <span className="text-2xl">{link.icon}</span>
-            <h2 className="mt-2 text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+            <h2 className="mt-2 text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
               {link.title}
             </h2>
             <p className="mt-0.5 text-xs text-gray-500">{link.description}</p>

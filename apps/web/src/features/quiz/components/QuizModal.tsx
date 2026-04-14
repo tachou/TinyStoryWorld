@@ -19,7 +19,7 @@ interface QuizModalProps {
 }
 
 const TYPE_BADGES: Record<string, { label: string; color: string }> = {
-  literal: { label: 'Recall', color: 'bg-blue-100 text-blue-700' },
+  literal: { label: 'Recall', color: 'bg-primary-100 text-primary-700' },
   inferential: { label: 'Think Deeper', color: 'bg-purple-100 text-purple-700' },
   applied: { label: 'Connect', color: 'bg-green-100 text-green-700' },
 };
@@ -103,7 +103,7 @@ export function QuizModal({ bookId, bookTitle, questions, onClose, onComplete }:
 
           <div className="mt-6 flex items-center justify-center gap-4">
             <div className="text-center">
-              <p className="text-4xl font-black text-indigo-600">{finalScore}%</p>
+              <p className="text-4xl font-black text-primary-600">{finalScore}%</p>
               <p className="text-xs text-gray-500 mt-1">Score</p>
             </div>
             <div className="w-px h-12 bg-gray-200" />
@@ -141,7 +141,7 @@ export function QuizModal({ bookId, bookTitle, questions, onClose, onComplete }:
               onClose();
             }}
             disabled={submitting}
-            className="mt-6 w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="mt-6 w-full py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
             {submitting ? 'Saving...' : 'Done'}
           </button>
@@ -156,7 +156,7 @@ export function QuizModal({ bookId, bookTitle, questions, onClose, onComplete }:
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 text-white">
+        <div className="bg-gradient-to-r from-primary-600 to-purple-600 px-6 py-4 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs opacity-80">Reading Quiz</p>
@@ -204,9 +204,9 @@ export function QuizModal({ bookId, bookTitle, questions, onClose, onComplete }:
                   className += 'border-gray-200 bg-gray-50 text-gray-400';
                 }
               } else if (idx === selectedIndex) {
-                className += 'border-indigo-500 bg-indigo-50 text-indigo-800 ring-2 ring-indigo-200';
+                className += 'border-primary-500 bg-primary-50 text-primary-800 ring-2 ring-primary-200';
               } else {
-                className += 'border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:bg-indigo-50/50';
+                className += 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50/50';
               }
 
               return (
@@ -254,14 +254,14 @@ export function QuizModal({ bookId, bookTitle, questions, onClose, onComplete }:
             <button
               onClick={handleCheck}
               disabled={selectedIndex === null}
-              className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Check Answer
             </button>
           ) : (
             <button
               onClick={handleNext}
-              className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-colors"
+              className="px-6 py-2.5 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 transition-colors"
             >
               {currentQ < totalQuestions - 1 ? 'Next Question' : 'See Results'}
             </button>

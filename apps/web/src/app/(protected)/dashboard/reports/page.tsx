@@ -57,7 +57,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 const STAGE_COLORS: Record<string, string> = {
   emergent: 'bg-green-100 text-green-700',
-  beginner: 'bg-blue-100 text-blue-700',
+  beginner: 'bg-primary-100 text-primary-700',
   in_transition: 'bg-yellow-100 text-yellow-700',
   competent: 'bg-purple-100 text-purple-700',
   experienced: 'bg-red-100 text-red-700',
@@ -65,7 +65,7 @@ const STAGE_COLORS: Record<string, string> = {
 
 const STAGE_BAR_COLORS: Record<string, string> = {
   emergent: 'bg-green-400',
-  beginner: 'bg-blue-400',
+  beginner: 'bg-primary-400',
   in_transition: 'bg-yellow-400',
   competent: 'bg-purple-400',
   experienced: 'bg-red-400',
@@ -85,14 +85,14 @@ function ClassOverview({ stats, stageDistribution, totalStudents }: {
           label="Active Students"
           value={`${stats.activeStudents}/${stats.totalStudents}`}
           sub={`${stats.totalStudents > 0 ? Math.round((stats.activeStudents / stats.totalStudents) * 100) : 0}% engaged`}
-          color="bg-indigo-50 border-indigo-200"
+          color="bg-primary-50 border-primary-200"
         />
         <StatBox
           icon={'\u{1F4D6}'}
           label="Total Pages Read"
           value={stats.totalPages}
           sub={`${stats.totalReadingSessions} sessions`}
-          color="bg-blue-50 border-blue-200"
+          color="bg-primary-50 border-primary-200"
         />
         <StatBox
           icon={'\u23F1\uFE0F'}
@@ -194,7 +194,7 @@ function ActivityChart({ data }: { data: ClassProgress['dailyActivity'] }) {
             >
               <div className="w-full flex flex-col items-center justify-end h-24">
                 <div
-                  className="w-full max-w-[24px] bg-indigo-400 rounded-t-sm hover:bg-indigo-500 transition-colors cursor-help"
+                  className="w-full max-w-[24px] bg-primary-400 rounded-t-sm hover:bg-primary-500 transition-colors cursor-help"
                   style={{ height: `${height}%` }}
                 />
               </div>
@@ -444,7 +444,7 @@ export default function ReportsPage() {
   return (
     <div className="mx-auto max-w-6xl">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold ">
           {'\u{1F4C8}'} Progress Reports
         </h1>
       </div>
@@ -481,7 +481,7 @@ export default function ReportsPage() {
                 onClick={() => setPeriod(opt.value)}
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                   period === opt.value
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-primary-600 text-white'
                     : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
                 }`}
               >
@@ -495,7 +495,7 @@ export default function ReportsPage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-20">
-          <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
         </div>
       )}
 

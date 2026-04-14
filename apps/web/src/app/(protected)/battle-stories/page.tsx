@@ -60,7 +60,7 @@ function BattleStoriesContent() {
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold ">
           {'\u2694\uFE0F'} Battle Story Builder
         </h1>
         <p className="text-gray-500 mt-1">

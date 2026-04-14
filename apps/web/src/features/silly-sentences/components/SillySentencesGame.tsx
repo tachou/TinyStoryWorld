@@ -337,7 +337,7 @@ function GameScreen() {
           </button>
           <button
             onClick={startNewRound}
-            className="px-6 py-3 bg-indigo-100 text-indigo-700 font-bold rounded-2xl shadow-md hover:bg-indigo-200 transition-colors"
+            className="px-6 py-3 bg-primary-100 text-primary-700 font-bold rounded-2xl shadow-md hover:bg-primary-200 transition-colors"
           >
             {'\uD83D\uDD04'} {locale.newRound}
           </button>

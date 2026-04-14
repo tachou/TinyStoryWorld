@@ -17,6 +17,15 @@ const fredoka = Fredoka({
 export const metadata: Metadata = {
   title: "Tiny Story World",
   description: "A Multilingual Learning Platform for K-6 Classrooms",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: { url: "/favicon.png", sizes: "180x180" },
+  },
+  manifest: "/site.webmanifest",
+  themeColor: "#d6453d",
 };
 
 export default function RootLayout({

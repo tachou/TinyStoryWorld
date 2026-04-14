@@ -71,7 +71,7 @@ export function VocabularyCards({ words, language, onDismiss }: VocabularyCardsP
 
         {/* Card */}
         <div
-          className="min-h-[180px] flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border-2 border-indigo-200 cursor-pointer"
+          className="min-h-[180px] flex flex-col items-center justify-center bg-gradient-to-br from-primary-50 to-purple-50 rounded-xl border-2 border-primary-200 cursor-pointer"
           onClick={() => {
             speak(word);
             setRevealed(true);
@@ -79,10 +79,10 @@ export function VocabularyCards({ words, language, onDismiss }: VocabularyCardsP
         >
           <p className="text-4xl font-bold text-gray-900 mb-2">{word}</p>
           {!revealed && (
-            <p className="text-xs text-indigo-400">Tap to hear pronunciation</p>
+            <p className="text-xs text-primary-400">Tap to hear pronunciation</p>
           )}
           {revealed && (
-            <p className="text-sm text-indigo-600 mt-2">
+            <p className="text-sm text-primary-600 mt-2">
               {'\u{1F50A}'} Listen again
             </p>
           )}
@@ -111,7 +111,7 @@ export function VocabularyCards({ words, language, onDismiss }: VocabularyCardsP
             {isLast ? (
               <button
                 onClick={onDismiss}
-                className="px-4 py-2 text-sm font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                className="px-4 py-2 text-sm font-bold bg-primary-600 text-white rounded-lg hover:bg-primary-700"
               >
                 Start Reading {'\u2192'}
               </button>
@@ -121,7 +121,7 @@ export function VocabularyCards({ words, language, onDismiss }: VocabularyCardsP
                   setCurrentIndex(currentIndex + 1);
                   setRevealed(false);
                 }}
-                className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700"
               >
                 Next {'\u2192'}
               </button>
@@ -135,7 +135,7 @@ export function VocabularyCards({ words, language, onDismiss }: VocabularyCardsP
             <div
               key={idx}
               className={`w-2 h-2 rounded-full transition-colors ${
-                idx === currentIndex ? 'bg-indigo-500' : idx < currentIndex ? 'bg-indigo-200' : 'bg-gray-200'
+                idx === currentIndex ? 'bg-primary-500' : idx < currentIndex ? 'bg-primary-200' : 'bg-gray-200'
               }`}
             />
           ))}

@@ -35,7 +35,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 const STAGE_COLORS: Record<string, string> = {
   emergent: 'bg-green-100 text-green-700',
-  beginner: 'bg-blue-100 text-blue-700',
+  beginner: 'bg-primary-100 text-primary-700',
   in_transition: 'bg-yellow-100 text-yellow-700',
   competent: 'bg-purple-100 text-purple-700',
   experienced: 'bg-red-100 text-red-700',
@@ -56,7 +56,7 @@ function ChildCard({ child }: { child: ChildData }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-5 text-white">
+      <div className="bg-gradient-to-r from-primary-500 to-purple-500 p-5 text-white">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-2xl font-black">
             {child.name.charAt(0).toUpperCase()}
@@ -81,7 +81,7 @@ function ChildCard({ child }: { child: ChildData }) {
       <div className="p-5">
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div className="text-center">
-            <p className="text-2xl font-black text-indigo-600">{child.reading.totalPages}</p>
+            <p className="text-2xl font-black text-primary-600">{child.reading.totalPages}</p>
             <p className="text-[10px] text-gray-500 uppercase font-medium">Pages Read</p>
           </div>
           <div className="text-center">
@@ -113,9 +113,9 @@ function ChildCard({ child }: { child: ChildData }) {
 
         {/* Activity summary */}
         <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="bg-blue-50 rounded-lg p-3">
-            <p className="text-xs text-blue-600 font-medium">{'\u{1F4D6}'} Books Read</p>
-            <p className="text-lg font-bold text-blue-800">{child.reading.uniqueBooks}</p>
+          <div className="bg-primary-50 rounded-lg p-3">
+            <p className="text-xs text-primary-600 font-medium">{'\u{1F4D6}'} Books Read</p>
+            <p className="text-lg font-bold text-primary-800">{child.reading.uniqueBooks}</p>
           </div>
           <div className="bg-purple-50 rounded-lg p-3">
             <p className="text-xs text-purple-600 font-medium">{'\u270D\uFE0F'} Stories Created</p>
@@ -187,14 +187,14 @@ export default function FamilyPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-bold text-gray-900">
+      <h1 className="text-2xl font-bold ">
         {'\u{1F468}\u200D\u{1F469}\u200D\u{1F467}'} Family Dashboard
       </h1>
       <p className="mt-1 text-gray-600">Welcome, {name}!</p>
 
       {loading && (
         <div className="flex justify-center py-16">
-          <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
         </div>
       )}
 

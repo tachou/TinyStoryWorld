@@ -158,7 +158,7 @@ export function BookReader({ book, onClose, onSessionComplete, showTranslationTo
                 onClick={() => setShowTranslation(!showTranslation)}
                 className={`text-xs font-medium px-3 py-1 rounded-full border transition-colors ${
                   showTranslation
-                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    ? 'bg-primary-600 text-white border-primary-600'
                     : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
                 }`}
                 title="Toggle English translation"
@@ -207,7 +207,7 @@ export function BookReader({ book, onClose, onSessionComplete, showTranslationTo
                     cursor-pointer rounded px-0.5 transition-all duration-100
                     ${isHighlighted
                       ? 'bg-yellow-300 text-gray-900 scale-105 inline-block'
-                      : 'hover:bg-blue-50 hover:text-blue-800'
+                      : 'hover:bg-primary-50 hover:text-primary-800'
                     }
                   `}
                   role="button"
@@ -242,7 +242,7 @@ export function BookReader({ book, onClose, onSessionComplete, showTranslationTo
                     key={i}
                     onClick={() => goToPage(i)}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      i === currentPageIndex ? 'bg-indigo-600' : 'bg-gray-300 hover:bg-gray-400'
+                      i === currentPageIndex ? 'bg-primary-600' : 'bg-gray-300 hover:bg-gray-400'
                     }`}
                     aria-label={`Go to page ${i + 1}`}
                   />
@@ -266,7 +266,7 @@ export function BookReader({ book, onClose, onSessionComplete, showTranslationTo
               <button
                 onClick={() => setMode('listen')}
                 className={`px-3 py-1.5 font-medium transition-colors ${
-                  mode === 'listen' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                  mode === 'listen' ? 'bg-primary-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 Listen
@@ -274,7 +274,7 @@ export function BookReader({ book, onClose, onSessionComplete, showTranslationTo
               <button
                 onClick={() => setMode('read')}
                 className={`px-3 py-1.5 font-medium transition-colors ${
-                  mode === 'read' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                  mode === 'read' ? 'bg-primary-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 Read
@@ -285,7 +285,7 @@ export function BookReader({ book, onClose, onSessionComplete, showTranslationTo
             {mode === 'listen' && (
               <button
                 onClick={togglePlayPause}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-md"
               >
                 {isPlaying ? '\u23F8' : '\u25B6'}
               </button>

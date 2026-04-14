@@ -133,7 +133,7 @@ export default function StoriesPage() {
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold ">
           {'\u2728'} AI Story Generator
         </h1>
         <p className="text-gray-500 mt-1">
@@ -158,7 +158,7 @@ export default function StoriesPage() {
                 onClick={() => setSelectedTheme(theme.key)}
                 className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs font-medium transition-all ${
                   selectedTheme === theme.key
-                    ? 'bg-indigo-100 border-indigo-300 text-indigo-700 ring-2 ring-indigo-300'
+                    ? 'bg-primary-100 border-primary-300 text-primary-700 ring-2 ring-primary-300'
                     : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -206,7 +206,7 @@ export default function StoriesPage() {
             ))}
           </select>
           {wordlistId && (
-            <p className="text-xs text-indigo-500 mt-1">
+            <p className="text-xs text-primary-500 mt-1">
               The story will incorporate vocabulary from this word list and show a
               coverage score.
             </p>
@@ -221,7 +221,7 @@ export default function StoriesPage() {
         <button
           onClick={handleGenerate}
           disabled={generating}
-          className="w-full px-5 py-3 text-sm font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+          className="w-full px-5 py-3 text-sm font-bold bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
         >
           {generating ? (
             <span className="flex items-center justify-center gap-2">

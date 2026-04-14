@@ -34,7 +34,7 @@ export function ReadingHistory() {
   if (loading) {
     return (
       <div className="flex justify-center py-8">
-        <div className="animate-spin w-6 h-6 border-3 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-6 h-6 border-3 border-primary-600 border-t-transparent rounded-full" />
       </div>
     );
   }

@@ -148,7 +148,7 @@ export function ClassroomFeed() {
                     </span>
                   )}
                   {story.voteCounts.smartest > 0 && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700">
                       {'\u{1F9E0}'} {story.voteCounts.smartest}
                     </span>
                   )}

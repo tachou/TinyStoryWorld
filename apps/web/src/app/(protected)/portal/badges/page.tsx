@@ -25,7 +25,7 @@ interface Stats {
 }
 
 const CATEGORY_INFO: Record<string, { label: string; icon: string; color: string }> = {
-  reading: { label: 'Reading', icon: '\u{1F4D6}', color: 'text-blue-600' },
+  reading: { label: 'Reading', icon: '\u{1F4D6}', color: 'text-primary-600' },
   writing: { label: 'Writing', icon: '\u270D\uFE0F', color: 'text-red-600' },
   grammar: { label: 'Grammar', icon: '\u{1F9E9}', color: 'text-purple-600' },
   social: { label: 'Social', icon: '\u{1F91D}', color: 'text-green-600' },
@@ -158,7 +158,7 @@ export default function BadgesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -168,7 +168,7 @@ export default function BadgesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold ">
             {'\u{1F3C6}'} My Badges
           </h1>
           <p className="text-gray-500 text-sm mt-1">
@@ -177,7 +177,7 @@ export default function BadgesPage() {
         </div>
         <Link
           href="/portal"
-          className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+          className="text-sm text-primary-600 hover:text-primary-700 font-medium"
         >
           {'\u2190'} Back to Portal
         </Link>
@@ -187,7 +187,7 @@ export default function BadgesPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mb-6">
         <div className="flex items-center justify-between text-sm mb-2">
           <span className="font-medium text-gray-700">Badge Progress</span>
-          <span className="font-bold text-indigo-600">
+          <span className="font-bold text-primary-600">
             {totalCount > 0 ? Math.round((earnedCount / totalCount) * 100) : 0}%
           </span>
         </div>
@@ -222,7 +222,7 @@ export default function BadgesPage() {
             onClick={() => setFilter(tab.key)}
             className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
               filter === tab.key
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-primary-600 text-white'
                 : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
             }`}
           >

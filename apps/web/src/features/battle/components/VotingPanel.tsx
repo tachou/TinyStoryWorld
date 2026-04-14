@@ -17,7 +17,7 @@ const VOTE_CATEGORIES: {
   activeColor: string;
 }[] = [
   { key: 'funniest', emoji: '\u{1F923}', label: 'Funniest', color: 'bg-yellow-50 border-yellow-200 text-yellow-700', activeColor: 'bg-yellow-200 border-yellow-400 text-yellow-800 ring-2 ring-yellow-300' },
-  { key: 'smartest', emoji: '\u{1F9E0}', label: 'Smartest', color: 'bg-blue-50 border-blue-200 text-blue-700', activeColor: 'bg-blue-200 border-blue-400 text-blue-800 ring-2 ring-blue-300' },
+  { key: 'smartest', emoji: '\u{1F9E0}', label: 'Smartest', color: 'bg-primary-50 border-primary-200 text-primary-700', activeColor: 'bg-primary-200 border-primary-400 text-primary-800 ring-2 ring-primary-300' },
   { key: 'surprising', emoji: '\u{1F92F}', label: 'Surprising', color: 'bg-purple-50 border-purple-200 text-purple-700', activeColor: 'bg-purple-200 border-purple-400 text-purple-800 ring-2 ring-purple-300' },
   { key: 'best_plan', emoji: '\u{1F3AF}', label: 'Best Plan', color: 'bg-green-50 border-green-200 text-green-700', activeColor: 'bg-green-200 border-green-400 text-green-800 ring-2 ring-green-300' },
 ];

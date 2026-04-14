@@ -222,7 +222,7 @@ export function BattleBuilder({ prefill }: BattleBuilderProps) {
 
         {/* Fighter B */}
         <fieldset className="space-y-2">
-          <legend className="text-sm font-semibold text-blue-600">Fighter B</legend>
+          <legend className="text-sm font-semibold text-primary-600">Fighter B</legend>
           <div className="flex gap-3">
             <select
               value={numberB}
