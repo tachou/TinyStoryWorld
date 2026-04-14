@@ -38,6 +38,15 @@ Teachers today can import books via the 4-step wizard on `/dashboard/books`, but
 - Scheduled or background generation (blocking modal only).
 - Cost quotas or rate limiting (v1 trusts the small teacher cohort).
 
+### Confirmed in-scope decisions (v1)
+
+- **Regenerate one book** — each draft card has a *Regenerate* button that reruns the same prompt (with a different random seed or fresh `avoidTitles` list) and replaces the draft in place.
+- **Partial-batch failure** — successes are saved; failed slots render a red error row in the progress UI with a per-slot *Retry* button. The rest of the batch is not rolled back.
+- **Curriculum coverage at generation time** — after each book is saved, compute and insert a `bookCurriculumScores` row against the source word list so the draft card shows coverage% immediately. Use the same helper the import wizard already calls.
+- **Duplicate detection** — if the teacher submits a batch whose `(wordlistId, level, emphasizedWords[])` tuple matches an existing draft/published batch from the same teacher, show a soft confirm modal: *"You already generated 3 books with these settings last week. Generate anyway?"* — not a hard block.
+- **Level → pages/words targets** — calibration in §7 is the shipping default (emergent 6 / 3–6 / 20–35 … experienced 14 / 40–60 / 300–400).
+- **Draft badge copy** — `Draft — visible only to you` on the list view.
+
 ---
 
 ## 4. User Flow
@@ -196,7 +205,20 @@ Each book fills in its title as soon as Claude returns it. Progress comes from t
 
 ### Draft badge on `/dashboard/books` list
 
-Books where `isDraft = true` render a small gray pill: `Draft — visible only to you`. Clicking the book title still routes to the existing preview page. Add a **Publish** action next to the existing Delete button for drafts.
+Books where `isDraft = true` render a small gray pill: **`Draft — visible only to you`**. Clicking the book title still routes to the existing preview page. Drafts also get:
+
+- **Publish** button (next to the existing Delete button)
+- **Regenerate** button — opens a confirm dialog and replaces the current draft's pages with a fresh Claude run against the same parameters. Title is regenerated too; old book_pages rows are deleted and recreated.
+- Curriculum coverage badge — pulls the latest row from `bookCurriculumScores` for `(bookId, sourceWordlistId)` so the teacher sees e.g. `Coverage: 72%` without opening the draft.
+
+### Duplicate-batch confirm
+
+When the teacher clicks Generate, the server first checks for any existing book owned by this teacher where `(sourceWordlistId, stage, emphasizedWords[])` matches the requested batch. If any match, the client renders a soft-confirm modal:
+
+> You already generated **{N}** book{s} with these exact settings ({date}).
+> Generate anyway?  [ Cancel ]  [ Generate anyway ]
+
+Not a hard block — match-normalization uses a sorted-lowercase compare on `emphasizedWords` so trivial reordering doesn't dodge the check.
 
 ### Student side
 
@@ -227,22 +249,18 @@ No UI changes. Drafts are filtered out server-side.
 ## 11. Open Questions / Deferred
 
 - **Image generation (v2).** The most-requested follow-up once teachers hit the "upload image × 8 pages × 5 books = 40 uploads" wall. Likely integrate an image API (OpenAI / Imagen) with a per-teacher daily cap.
-- **Regenerate one book.** If the teacher doesn't like draft #3, should there be a "Regenerate this one" button in the review UI? Probably yes in v1.1 — cheap to add, improves trust.
-- **Partial-batch failure handling.** If book #4 of 5 fails mid-generation, do we save the first 3 and report the failure, or abort all? Current proposal: save successes, flag the failed slot red in the progress UI, teacher can retry.
-- **Curriculum-coverage score at generation time.** The existing `bookCurriculumScores` table is populated for imported books. The generate endpoint should populate it too so the teacher immediately sees coverage% in the draft card.
 - **Benchmark flag.** `isBenchmark` exists on `books`; should generated books ever be marked benchmark? v1 says no — benchmarks are curated by admins.
-- **Assignments from drafts.** Should `POST /api/assignments` reject `bookId` pointing at a draft? Yes — noted as a server-side guard in v1.
-- **Duplicate detection.** If a teacher runs the same batch twice, should we warn? v1: no, teacher can delete duplicates.
+- **Assignments from drafts.** Server-side guard in v1: `POST /api/assignments` rejects `bookId` pointing at a draft.
 
 ---
 
 ## 12. Rollout
 
 1. Schema migration (three new columns on `books`).
-2. API: `POST /api/books/generate`, extend `PATCH /api/books/[id]`, update `GET /api/books` filter.
-3. UI: `BookGenerateWizard` modal + Draft badge / Publish button on `/dashboard/books`.
+2. API: `POST /api/books/generate` (SSE, saves on each book complete, writes `bookCurriculumScores` inline), `POST /api/books/[id]/regenerate`, extend `PATCH /api/books/[id]`, update `GET /api/books` filter, add duplicate-check helper.
+3. UI: `BookGenerateWizard` modal + Draft badge / Publish / Regenerate buttons / coverage badge on `/dashboard/books`, plus the soft-confirm duplicate dialog.
 4. Server-side guard: `POST /api/assignments` rejects drafts.
-5. QA: generate batch of 3 books, verify drafts invisible to students, publish one, verify it appears in `/portal/library`, delete a draft, cancel mid-generation.
+5. QA: generate batch of 3 books, verify drafts invisible to students, regenerate one draft, simulate a mid-batch Claude failure (success rows remain, failed slot shows Retry), re-submit same batch and confirm duplicate warning fires, publish a draft, verify it appears in `/portal/library`, delete a draft, cancel mid-generation.
 6. Ship no-flag — default behavior for existing books is unchanged (`isDraft = false`, `creatorId = NULL`).
 
 ---
