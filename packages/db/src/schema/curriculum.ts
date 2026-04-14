@@ -13,6 +13,7 @@ export const curriculumWordLists = pgTable('curriculum_word_lists', {
   matchMode: text('match_mode').notNull().default('word'), // character | word | syllable | pinyin
   version: integer('version').notNull().default(1),
   isSharedClassList: boolean('is_shared_class_list').notNull().default(false),
+  isPublic: boolean('is_public').notNull().default(false),
   classId: uuid('class_id').references(() => classes.id),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

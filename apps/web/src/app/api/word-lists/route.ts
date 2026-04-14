@@ -7,7 +7,8 @@ import { autoTagWords } from '@/lib/posLookup';
 /**
  * GET /api/word-lists — List word lists for the current user
  * Teachers see their own lists.
- * Students see their own lists + lists owned by their class teachers.
+ * Students see their own lists + lists owned by their class teachers + any
+ * list marked public by any teacher on the platform.
  */
 export async function GET() {
   const session = await auth();
@@ -35,14 +36,28 @@ export async function GET() {
       teacherIds.push(...teacherClasses.map((c) => c.teacherId));
     }
 
-    // Get own lists + teacher lists
+    // Own lists + class-teacher lists + any public list
     const ownerIds = [...new Set([session.user.id, ...teacherIds])];
     const lists = await db
       .select()
       .from(curriculumWordLists)
-      .where(inArray(curriculumWordLists.ownerId, ownerIds));
+      .where(
+        or(
+          inArray(curriculumWordLists.ownerId, ownerIds),
+          eq(curriculumWordLists.isPublic, true)
+        )
+      );
 
-    return NextResponse.json(lists);
+    // Drizzle `or` can return duplicates when a public list is also owned by
+    // one of the student's teachers. De-dupe by id.
+    const seen = new Set<string>();
+    const deduped = lists.filter((l) => {
+      if (seen.has(l.id)) return false;
+      seen.add(l.id);
+      return true;
+    });
+
+    return NextResponse.json(deduped);
   }
 
   // Teachers/parents/admins see their own lists

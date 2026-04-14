@@ -13,6 +13,7 @@ interface WordList {
   name: string;
   language: string;
   words: WordEntry[];
+  isPublic: boolean;
   createdAt: string;
 }
 
@@ -84,6 +85,39 @@ export default function WordListsPage() {
   const [uploading, setUploading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showAllWords, setShowAllWords] = useState(false);
+  const [togglingPublic, setTogglingPublic] = useState<Set<string>>(new Set());
+
+  const handleTogglePublic = async (listId: string, nextValue: boolean) => {
+    setTogglingPublic((prev) => new Set(prev).add(listId));
+    // Optimistic update
+    setLists((prev) =>
+      prev.map((l) => (l.id === listId ? { ...l, isPublic: nextValue } : l))
+    );
+    try {
+      const res = await fetch(`/api/word-lists/${listId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic: nextValue }),
+      });
+      if (!res.ok) {
+        // Revert on failure
+        setLists((prev) =>
+          prev.map((l) => (l.id === listId ? { ...l, isPublic: !nextValue } : l))
+        );
+      }
+    } catch (err) {
+      console.error('Failed to toggle isPublic:', err);
+      setLists((prev) =>
+        prev.map((l) => (l.id === listId ? { ...l, isPublic: !nextValue } : l))
+      );
+    } finally {
+      setTogglingPublic((prev) => {
+        const next = new Set(prev);
+        next.delete(listId);
+        return next;
+      });
+    }
+  };
 
   const fetchLists = useCallback(async () => {
     try {
@@ -260,6 +294,15 @@ export default function WordListsPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-4">
+                    {list.isPublic && (
+                      <span
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700"
+                        title="Visible to every student on the platform"
+                      >
+                        <span aria-hidden>{'\u{1F30D}'}</span>
+                        Public
+                      </span>
+                    )}
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-700">
                       {list.words.length} words
                     </span>
@@ -307,6 +350,37 @@ export default function WordListsPage() {
                         Show fewer
                       </button>
                     )}
+
+                    {/* Visibility toggle */}
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-gray-700">
+                          Public list
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          Share with every student on the platform, not just your classes.
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={list.isPublic}
+                        disabled={togglingPublic.has(list.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTogglePublic(list.id, !list.isPublic);
+                        }}
+                        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+                          list.isPublic ? 'bg-green-600' : 'bg-gray-300'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                            list.isPublic ? 'translate-x-5' : 'translate-x-0.5'
+                          }`}
+                        />
+                      </button>
+                    </div>
 
                     {/* POS stats + delete */}
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
