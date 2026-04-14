@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Nunito, Fredoka } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const nunito = Nunito({
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-nunito",
+});
+
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-fredoka",
 });
 
 export const metadata: Metadata = {
@@ -17,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className={`${nunito.variable} ${fredoka.variable}`}>
+      <body className={nunito.className}>{children}</body>
     </html>
   );
 }
