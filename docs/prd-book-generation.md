@@ -2,7 +2,7 @@
 
 **Project:** Tiny Story World
 **Date:** April 14, 2026
-**Status:** Draft
+**Status:** Shipped (v1)
 **Author:** Product
 
 ---
@@ -275,3 +275,29 @@ No UI changes. Drafts are filtered out server-side.
 - Image upload endpoint (draft illustration workflow): `apps/web/src/app/api/books/upload-image/route.ts`
 - Translation endpoint (post-publish workflow): `apps/web/src/app/api/books/translate/route.ts`
 - Related PRDs: `docs/prd-global-curriculum.md`, `docs/prd-public-word-lists.md`
+
+---
+
+## Implementation Notes (shipped April 15, 2026)
+
+### What shipped
+All items in the PRD shipped as specified, with these implementation details:
+
+- **SSE streaming**: `POST /api/books/generate` emits `batch_start`, `book_start`, `book_done`/`book_error`, and `batch_done` frames. The client parses via `ReadableStream.getReader()` splitting on `\n\n`. Sequential generation (not parallel) to accumulate `avoidTitles`.
+- **MOCK_LLM mode**: Set `MOCK_LLM=1` in `.env.local` to skip real Claude calls and generate canned books for offline development. The mock builder (`buildMockBook()`) produces level-appropriate page counts using all words from the source list.
+- **Coverage scoring**: Computed inline after each book is saved via `computeAndStoreCoverage()` in `bookGeneration.ts`. Uses word-boundary regex for Latin scripts, character-level `includes()` for CJK.
+- **Duplicate detection**: `findDuplicateBatch()` matches `(creatorId, sourceWordlistId, stage)`. Since `emphasizedWords` aren't stored on books, the check compares against the full word inventory of the source list. Returns up to 5 most recent matches.
+- **Draft visibility**: `GET /api/books` filters with `WHERE isDraft = false OR creatorId = session.user.id` (admins see all). `GET /api/books/[id]` also enforces this. `POST /api/assignments` rejects draft book IDs.
+- **Wizard component**: `BookGenerateWizard.tsx` — word list `<select>` grouped by "My lists" / "Public lists", level radio buttons, count pills (1-5), emphasized-word chip multi-select with `key={selectedList.id}` to force React remount on list change, AbortController for cancel.
+
+### What didn't ship (deferred to v2)
+- Per-book progress bars showing page-level writing progress (v1 shows book-level done/writing/error)
+- Per-slot Retry button on partial failures (v1 shows error text only)
+- `hasPictures` checkbox (v1 always sets `hasPictures = false`; teachers can upload images post-generation via existing flow)
+- Image generation via external API
+
+### Key files
+- `apps/web/src/lib/bookGeneration.ts` — prompt builder, Claude/mock caller, coverage scoring, duplicate detection
+- `apps/web/src/app/api/books/generate/route.ts` — SSE batch generation endpoint
+- `apps/web/src/app/api/books/[id]/regenerate/route.ts` — single-draft regeneration
+- `apps/web/src/components/BookGenerateWizard.tsx` — wizard modal UI

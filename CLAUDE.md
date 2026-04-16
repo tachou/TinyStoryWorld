@@ -44,7 +44,8 @@ The preview server name is **`tsw`** (use this with `preview_start` tool). The s
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL (for Storage)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key (for client-side)
 - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key (for server-side storage uploads)
-- `ANTHROPIC_API_KEY` — Claude API key for AI story/quiz generation and translation backfill (may be empty in dev)
+- `ANTHROPIC_API_KEY` — Claude API key for AI story/quiz generation, book generation, and translation backfill (may be empty in dev)
+- `MOCK_LLM` — Set to `1` to skip real Claude calls in book generation and use canned mock books (useful for offline dev)
 
 ## Test Accounts
 
@@ -72,8 +73,9 @@ The preview server name is **`tsw`** (use this with `preview_start` tool). The s
 - **AI Stories**: `/stories` — theme-based AI story generation
 - **Teacher Dashboard**: `/dashboard` — classes, assignments, word lists, books, reports
 - **Teacher Classes**: `/dashboard/classes` — manage students, assign curriculum per student or per class
-- **Teacher Books**: `/dashboard/books` — 4-step import wizard (JSON, images, curriculum, review), delete books, click title to preview
+- **Teacher Books**: `/dashboard/books` — import wizard, AI book generation wizard, draft/publish/regenerate workflow, coverage badges, click title to preview
 - **Teacher Book Preview**: `/dashboard/books/preview?bookId=xxx` — read book as student sees it, translation toggle for non-English books
+- **Book Generation**: Click "Generate Books" on `/dashboard/books` — select word list, reading level, count (1-5), optional emphasized words, streams progress via SSE
 - **Teacher Word Lists**: `/dashboard/word-lists` — create/manage curriculum word lists; per-list "Public" toggle to share platform-wide with all students
 
 ### Verifying global controls
@@ -113,6 +115,7 @@ TinyStoryWorld/
 │       │   │   │   └── silly-sentences/
 │       │   │   └── login/ & register/
 │       │   ├── components/           # Shared components
+│       │   │   ├── BookGenerateWizard.tsx  # AI book generation wizard modal
 │       │   │   ├── CurriculumBadge.tsx
 │       │   │   ├── CurriculumSelector.tsx
 │       │   │   └── VocabularySpotlight.tsx
@@ -130,6 +133,7 @@ TinyStoryWorld/
 │       │   │   └── languageStore.ts  # Global: language + curriculum + reading stage
 │       │   └── lib/
 │       │       ├── auth.ts           # NextAuth config
+│       │       ├── bookGeneration.ts # Claude prompt builder, mock mode, coverage scoring
 │       │       ├── posTagging.ts     # Runtime POS resolution for curriculum words
 │       │       └── posLookup.ts      # Static POS dictionary for CSV auto-tagging
 │       └── next.config.ts
@@ -148,6 +152,7 @@ TinyStoryWorld/
 │   ├── audio/                        # TTS/audio utilities
 │   └── ui/                           # Shared UI components
 ├── docs/
+│   ├── prd-book-generation.md        # Batch book generation PRD (shipped v1)
 │   ├── prd-global-curriculum.md      # Global curriculum feature PRD (mostly complete)
 │   ├── prd-public-word-lists.md      # Public word lists PRD (shipped v1)
 │   └── prd-seo-discovery.md          # SEO & AI discovery PRD (approved, not started)
@@ -160,8 +165,10 @@ TinyStoryWorld/
 | Route | Methods | Auth | Purpose |
 |-------|---------|------|---------|
 | `/api/auth/*` | GET/POST | — | NextAuth endpoints |
-| `/api/books` | GET | Any | List books (filterable by language/stage) |
-| `/api/books/[id]` | GET, DELETE | Any / Teacher+ | Get book with pages / Delete book |
+| `/api/books` | GET | Any | List books (filterable by language/stage; drafts hidden from non-owners) |
+| `/api/books/[id]` | GET, PATCH, DELETE | Any / Teacher+ | Get book / Toggle isDraft (publish/unpublish) / Delete book |
+| `/api/books/generate` | POST | Teacher+ | Batch-generate 1-5 books via Claude (SSE streaming) |
+| `/api/books/[id]/regenerate` | POST | Teacher+ | Re-run Claude on a draft, replacing content in place |
 | `/api/books/bulk` | POST | Teacher+ | Bulk import books from JSON (supports translationEn per page) |
 | `/api/books/upload-image` | POST | Teacher+ | Upload page illustration to Supabase Storage (multipart/form-data) |
 | `/api/books/translate` | POST | Teacher+ | Auto-generate English translations for book pages via Claude |
@@ -250,5 +257,8 @@ Full plan at `docs/prd-seo-discovery.md`. Key items:
 - [x] English translation support: optional `translationEn` per page in JSON, Claude auto-backfill for missing translations
 - [x] Supabase Storage integration for page illustrations (`book-images` bucket)
 - [x] Teacher book preview: click book title on `/dashboard/books` to read as student, with English translation toggle
-- [ ] Consider AI-assisted book generation (using Claude to write leveled readers)
+- [x] AI book generation: batch-generate 1-5 leveled readers from word lists via Claude (SSE streaming, draft workflow, coverage scoring, duplicate detection, MOCK_LLM fallback). See `docs/prd-book-generation.md`
+- [x] Draft management: publish/unpublish toggle, regenerate drafts, coverage badges, draft visibility guards
 - [ ] Book cover image upload/generation
+- [ ] AI image generation for book pages (v2)
+- [ ] Per-book progress bars during generation (v1 shows book-level status only)

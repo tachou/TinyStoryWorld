@@ -222,13 +222,40 @@
 - [ ] Assignment appears in list with type icon, due date, curriculum badge
 - [ ] Students see assignments on their portal
 
-### 7.4 Word Lists (`/dashboard/word-lists`)
+### 7.4 Book Generation (`/dashboard/books` > Generate Books)
+- [ ] Click "Generate Books" button — wizard modal opens
+- [ ] Word list dropdown shows own lists + public lists, grouped by section
+- [ ] Selecting a word list shows language label and populates emphasized-word chips
+- [ ] Switching word lists resets chips correctly (no stale chips from previous list)
+- [ ] Reading level radio buttons show all 5 levels; selecting one shows page/word targets
+- [ ] Number of books pills (1-5) — selecting updates the Generate button label
+- [ ] Emphasized word chips toggle on/off with visual feedback
+- [ ] Generate button disabled until word list and level are selected
+- [ ] Click Generate — modal switches to progress view with SSE streaming
+- [ ] Each book row shows spinner while writing, checkmark when done, warning on error
+- [ ] Book titles appear as they stream in from Claude
+- [ ] Cancel button aborts in-flight generation
+- [ ] On completion, "Generation complete" shows all books with draft labels
+- [ ] Done button closes modal and refreshes book list
+- [ ] Generated books appear in list with "Draft — visible only to you" badge
+- [ ] Draft rows show amber background and Publish/Regenerate/Delete buttons
+- [ ] Coverage badge appears on drafts (green >= 70%, yellow >= 40%, red < 40%)
+- [ ] Click Publish — draft badge removed, book visible to students
+- [ ] Click Unpublish on published book — reverts to draft state
+- [ ] Click Regenerate — confirm dialog, then replaces draft content with new Claude run
+- [ ] Duplicate detection: re-submitting same (wordlist, level) shows soft warning
+- [ ] "Generate anyway" bypasses duplicate warning
+- [ ] MOCK_LLM=1 in .env.local — generates canned books without real API key
+- [ ] Student cannot see draft books in `/portal/library`
+- [ ] Cannot assign a draft book via assignments API (returns 403)
+
+### 7.5 Word Lists (`/dashboard/word-lists`)
 - [ ] Create word list: name, language, script type
 - [ ] Upload CSV with columns: word, pos, phonetic
 - [ ] Word list appears in list with language, word count, date
 - [ ] Students can see teacher-created word lists (via class enrollment)
 
-### 7.5 Progress Reports (`/dashboard/reports`)
+### 7.6 Progress Reports (`/dashboard/reports`)
 - [ ] Class selector dropdown auto-selects first class
 - [ ] Period toggle: Last 7 days, Last 30 days, All time
 - [ ] Stat cards: Active Students, Total Pages Read, Reading Minutes, Stories Created
@@ -239,7 +266,7 @@
 - [ ] Inactive students (>7 days) highlighted with red background
 - [ ] Inactive Students warning section lists student names
 
-### 7.6 Content Moderation (`/dashboard/moderation`)
+### 7.7 Content Moderation (`/dashboard/moderation`)
 - [ ] Filter tabs: All Content / Battle Stories / AI Stories
 - [ ] Status tabs: Pending / Approved / Rejected
 - [ ] Stats cards: Total Pending, Battle Stories pending, AI Stories pending
@@ -402,7 +429,29 @@ GET /api/classes/:id/progress?period=30d  — Per-student stats for teacher
 - [ ] Returns: classStats, stageDistribution, dailyActivity, students array
 - [ ] Each student has: reading, battle, aiStories, silly aggregates
 
-### 13.6 Moderation API
+### 13.6 Book Generation API
+```
+POST /api/books/generate              — SSE batch generation {wordlistId, level, count, emphasizedWords}
+POST /api/books/[id]/regenerate       — Regenerate draft {emphasizedWords}
+PATCH /api/books/[id]                 — Toggle isDraft {isDraft: boolean}
+```
+- [ ] POST /generate returns SSE stream with batch_start, book_start, book_done, batch_done events
+- [ ] Count validated to 1-5, level validated against enum
+- [ ] Teacher can only generate from own lists or public lists
+- [ ] Student/parent calling /generate returns 403
+- [ ] Generated books saved as isDraft=true with creatorId and sourceWordlistId
+- [ ] Coverage scores computed and stored on each book_done
+- [ ] Duplicate detection returns duplicate_warning event when matching batch exists
+- [ ] allowDuplicate=true bypasses duplicate check
+- [ ] POST /regenerate only works on drafts owned by caller (or admin)
+- [ ] POST /regenerate replaces title, themes, and pages in place
+- [ ] PATCH isDraft=false publishes draft; isDraft=true unpublishes
+- [ ] PATCH only allowed for creator (or admin)
+- [ ] GET /api/books excludes other teachers' drafts from results
+- [ ] GET /api/books/[id] returns 404 for other teachers' drafts
+- [ ] POST /api/assignments rejects bookId pointing at a draft
+
+### 13.7 Moderation API
 ```
 GET   /api/moderation?type=all&status=pending  — List content for review
 PATCH /api/moderation                          — {id, contentType, action: approve|reject}
@@ -466,6 +515,7 @@ PATCH /api/moderation                          — {id, contentType, action: app
 | P1 | Silly Sentences gameplay | High — core feature |
 | P1 | Battle story generation | High — core feature |
 | P1 | Teacher class management | High — admin flow |
+| P1 | Book generation + draft workflow | High — teacher workflow |
 | P2 | Curriculum filter + coverage | Medium — teacher workflow |
 | P2 | Gamification (XP, badges, streaks) | Medium — engagement |
 | P2 | Progress reports | Medium — analytics |
