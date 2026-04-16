@@ -70,6 +70,9 @@ export default function BooksPage() {
   // Coverage scores keyed by bookId
   const [coverage, setCoverage] = useState<Record<string, CoverageEntry>>({});
 
+  // Word list names keyed by wordlistId — used to label coverage badges
+  const [wordlistNames, setWordlistNames] = useState<Record<string, string>>({});
+
   // Filters
   const [filterLang, setFilterLang] = useState('all');
   const [filterStage, setFilterStage] = useState('all');
@@ -126,6 +129,27 @@ export default function BooksPage() {
   useEffect(() => {
     fetchBooks();
   }, [fetchBooks]);
+
+  // Fetch word list names once so we can label coverage badges
+  useEffect(() => {
+    let canceled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/word-lists');
+        if (!res.ok) return;
+        const lists = (await res.json()) as Array<{ id: string; name: string }>;
+        if (canceled) return;
+        const map: Record<string, string> = {};
+        for (const l of lists) map[l.id] = l.name;
+        setWordlistNames(map);
+      } catch {
+        // skip — coverage badge will fall back to just "%"
+      }
+    })();
+    return () => {
+      canceled = true;
+    };
+  }, []);
 
   const handleDelete = async (bookId: string) => {
     if (confirmDelete !== bookId) {
@@ -386,16 +410,23 @@ export default function BooksPage() {
                     )}
                     {coveragePctInt !== null && (
                       <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full max-w-xs truncate ${
                           coveragePctInt >= 70
                             ? 'bg-green-100 text-green-700'
                             : coveragePctInt >= 40
                             ? 'bg-yellow-100 text-yellow-700'
                             : 'bg-red-100 text-red-700'
                         }`}
-                        title={`${cov!.matchedCount} of ${cov!.totalCount} curriculum words`}
+                        title={
+                          book.sourceWordlistId && wordlistNames[book.sourceWordlistId]
+                            ? `${cov!.matchedCount} of ${cov!.totalCount} words from "${wordlistNames[book.sourceWordlistId]}"`
+                            : `${cov!.matchedCount} of ${cov!.totalCount} curriculum words`
+                        }
                       >
-                        Coverage: {coveragePctInt}%
+                        {coveragePctInt}%
+                        {book.sourceWordlistId && wordlistNames[book.sourceWordlistId]
+                          ? ` of ${wordlistNames[book.sourceWordlistId]}`
+                          : ' coverage'}
                       </span>
                     )}
                   </div>
