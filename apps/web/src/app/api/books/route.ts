@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { getDb, books, bookPages } from '@tiny-story-world/db';
-import { eq } from 'drizzle-orm';
+import { getDb, books } from '@tiny-story-world/db';
+import { and, eq, or } from 'drizzle-orm';
 
 /**
- * GET /api/books — List all books (with optional language/stage filters)
+ * GET /api/books — List books (with optional language/stage filters).
+ * Drafts are hidden from everyone except their creator (and admins).
  */
 export async function GET(req: Request) {
   const session = await auth();
@@ -12,27 +13,30 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const role = (session.user as any).role;
   const { searchParams } = new URL(req.url);
   const language = searchParams.get('language');
   const stage = searchParams.get('stage');
 
   const db = getDb();
-  let query = db.select().from(books);
 
-  // Apply filters if provided
+  // Base visibility: non-drafts + creator's own drafts. Admins see everything.
   const conditions = [];
+  if (role !== 'admin') {
+    conditions.push(
+      or(eq(books.isDraft, false), eq(books.creatorId, session.user.id))
+    );
+  }
   if (language) conditions.push(eq(books.language, language));
   if (stage) conditions.push(eq(books.stage, stage as any));
 
-  let result;
-  if (conditions.length === 1) {
-    result = await query.where(conditions[0]);
-  } else if (conditions.length === 2) {
-    const { and } = await import('drizzle-orm');
-    result = await query.where(and(conditions[0], conditions[1]));
-  } else {
-    result = await query;
-  }
+  const query = db.select().from(books);
+  const result =
+    conditions.length === 0
+      ? await query
+      : conditions.length === 1
+      ? await query.where(conditions[0])
+      : await query.where(and(...conditions));
 
   return NextResponse.json(result);
 }

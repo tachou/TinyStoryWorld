@@ -147,6 +147,20 @@ export async function POST(req: NextRequest) {
 
   const db = getDb();
 
+  // Reject assignments pointing at a draft book the caller doesn't own
+  if (bookId) {
+    const [book] = await db.select().from(books).where(eq(books.id, bookId)).limit(1);
+    if (!book) {
+      return NextResponse.json({ error: 'Book not found' }, { status: 404 });
+    }
+    if (book.isDraft && role !== 'admin' && book.creatorId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Cannot assign a draft book — publish it first' },
+        { status: 403 }
+      );
+    }
+  }
+
   const [assignment] = await db
     .insert(assignments)
     .values({

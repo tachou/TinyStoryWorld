@@ -23,6 +23,9 @@ export const books = pgTable('books', {
   hasPinyin: boolean('has_pinyin').notNull().default(false),
   hasZhuyin: boolean('has_zhuyin').notNull().default(false),
   hasRomaja: boolean('has_romaja').notNull().default(false),
+  creatorId: uuid('creator_id').references(() => users.id),
+  isDraft: boolean('is_draft').notNull().default(false),
+  sourceWordlistId: uuid('source_wordlist_id').references(() => curriculumWordLists.id),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
